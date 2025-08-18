@@ -1,0 +1,24 @@
+[flake8]
+# Longitud máxima de línea permitida
+max-line-length = 230
+
+# Ignorar estos errores (pueden ajustarse a tu gusto)
+ignore = 
+    E203,
+    W503,
+    E266,
+    E402,
+    W605
+
+# Excluir carpetas que no queremos revisar
+exclude = 
+    .git,
+    __pycache__,
+    venv,
+    env,
+    build,
+    dist,
+    tests
+
+# Mostrar el número de errores por archivo
+count = True
