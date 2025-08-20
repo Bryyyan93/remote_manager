@@ -1,10 +1,19 @@
-# webapp/main.py
+# app/main.py
 from fastapi import FastAPI, HTTPException
-# from typing import List, Dict, Any
+from typing import List
+from pydantic import BaseModel, Field
 from api_onomondo import onomondo
-from ssh import utils, api_petitions as api
+from ssh import utils, api_petitions as api, comandos_ssh as ssh
 
 app = FastAPI(title="Remote Manager", version="0.1.0")
+
+
+# Body del request para envio de comandos
+class RunCmdReq(BaseModel):
+    username: str = Field(..., min_length=1)
+    password: str = Field(..., min_length=1)
+    cmds: List[str] = Field(..., min_items=1)   # comandos a ejecutar
+    ips: List[str] = Field(..., min_items=1)    # lista de IPs destino
 
 
 # Pantalla principla
@@ -44,3 +53,20 @@ def get_limites(tag):
         return {"limites": limites}
     except Exception as e:
         raise HTTPException(500, detail=str(e))
+
+
+##############################################################
+# GUI_COMMANDS
+##############################################################
+# Enviar comandos a los dispositivos
+@app.post("/comandos")
+def post_comandos(req: RunCmdReq):
+    try:
+        # OJO al orden: en tu GUI era (cmds, user, pass, ips)
+        result = ssh.command_all_ips(req.cmds, req.username, req.password, req.ips)
+
+        # Muchas implementaciones de gui/ssh imprimen por logger y no retornan nada.
+        # Si `result` es None, al menos devuelve OK.
+        return {"status": "ok", "result": result}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
