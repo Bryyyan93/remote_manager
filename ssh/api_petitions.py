@@ -9,8 +9,9 @@ logger = utils.configurar_logger("api")
 ########################################################
 # Extraer las IP desde la API de Onomono
 ########################################################
-def ip_list_api_mono(headers, inst_tag):
+def ip_list_api_mono(inst_tag):
     print("-> Llamada API")
+    headers = utils.api_headers()
     # Obtener lista de nodos desde la peticion API
     list_ips = []
     resp = onomondo.get_ips_status(headers, inst_tag)

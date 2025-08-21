@@ -35,6 +35,16 @@ def get_tags():
         raise HTTPException(500, detail=str(e))
 
 
+# Obtener IPs de un tag
+@app.get("/ips/{tag}")
+def get_ips(tag):
+    try:
+        ips = api.ip_list_api_mono(tag)
+        return {"ips": ips}
+    except Exception as e:
+        raise HTTPException(500, detail=str(e))
+
+
 # Ver los consumos de datos del tag
 @app.get("/consumos/{tag}")
 def get_consumos(tag):
@@ -62,7 +72,6 @@ def get_limites(tag):
 @app.post("/comandos")
 def post_comandos(req: RunCmdReq):
     try:
-        # OJO al orden: en tu GUI era (cmds, user, pass, ips)
         result = ssh.command_all_ips(req.cmds, req.username, req.password, req.ips)
 
         # Muchas implementaciones de gui/ssh imprimen por logger y no retornan nada.
@@ -70,3 +79,8 @@ def post_comandos(req: RunCmdReq):
         return {"status": "ok", "result": result}
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
+
+
+##############################################################
+# GUI_UPDATE
+##############################################################
