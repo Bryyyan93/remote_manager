@@ -1,12 +1,16 @@
 # app/main.py
+from io import StringIO
 from fastapi import FastAPI, HTTPException
 from typing import List
 from pydantic import BaseModel, Field
+import logging, contextlib
+
 from api_onomondo import onomondo
 from ssh import utils, api_petitions as api, comandos_ssh as ssh
 
 app = FastAPI(title="Remote Manager", version="0.1.0")
 
+utils.configurar_logger("cmds")
 
 # Body del request para envio de comandos
 class RunCmdReq(BaseModel):
@@ -16,11 +20,20 @@ class RunCmdReq(BaseModel):
     ips: List[str] = Field(..., min_items=1)    # lista de IPs destino
 
 
+class _BufferHandler(logging.Handler):
+    """Handler que guarda los logs formateados en una lista."""
+    def __init__(self):
+        super().__init__()
+        self.lines: List[str] = []
+    def emit(self, record):
+        msg = self.format(record)
+        self.lines.append(msg)
+
+
 # Pantalla principla
 @app.get("/")
 def root():
     return {"message": "Hello"}
-
 
 ##############################################################
 # GUI_API
@@ -71,14 +84,24 @@ def get_limites(tag):
 # Enviar comandos a los dispositivos
 @app.post("/comandos")
 def post_comandos(req: RunCmdReq):
+    logger = logging.getLogger("cmds")
+    buf_handler = _BufferHandler()
+    buf_handler.setFormatter(logging.Formatter('%(asctime)s - %(levelname)s - %(message)s'))
+    out_buf, err_buf = StringIO(), StringIO()
     try:
-        result = ssh.command_all_ips(req.cmds, req.username, req.password, req.ips)
+        with contextlib.redirect_stdout(out_buf), contextlib.redirect_stderr(err_buf):
+            result = ssh.command_all_ips(req.cmds, req.username, req.password, req.ips)
 
-        # Muchas implementaciones de gui/ssh imprimen por logger y no retornan nada.
-        # Si `result` es None, al menos devuelve OK.
-        return {"status": "ok", "result": result}
+        return {
+            "status": "ok", 
+            "result": result,
+            "logs": buf_handler.lines,
+            "stdout": out_buf.getvalue(),
+        }
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
+    finally:
+        logger.removeHandler(buf_handler)
 
 
 ##############################################################
