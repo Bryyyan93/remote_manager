@@ -1,16 +1,15 @@
 # app/main.py
-from io import StringIO
+import logging
 from fastapi import FastAPI, HTTPException
 from typing import List
 from pydantic import BaseModel, Field
-import logging, contextlib
-
 from api_onomondo import onomondo
 from ssh import utils, api_petitions as api, comandos_ssh as ssh
 
 app = FastAPI(title="Remote Manager", version="0.1.0")
 
 utils.configurar_logger("cmds")
+
 
 # Body del request para envio de comandos
 class RunCmdReq(BaseModel):
@@ -25,6 +24,7 @@ class _BufferHandler(logging.Handler):
     def __init__(self):
         super().__init__()
         self.lines: List[str] = []
+
     def emit(self, record):
         msg = self.format(record)
         self.lines.append(msg)
@@ -34,6 +34,7 @@ class _BufferHandler(logging.Handler):
 @app.get("/")
 def root():
     return {"message": "Hello"}
+
 
 ##############################################################
 # GUI_API
