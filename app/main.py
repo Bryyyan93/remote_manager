@@ -89,8 +89,3 @@ def post_comandos(req: RunCmdReq):
         return ssh.command_all_ips(req.cmds, req.username, req.password, req.ips)
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
-
-
-##############################################################
-# GUI_UPDATE
-##############################################################

@@ -13,6 +13,7 @@ def test_root():
     assert response.status_code == 200
     assert response.json() == {"message": "Hello"}
 
+
 ##############################################################
 # GUI_API
 ##############################################################
@@ -28,6 +29,7 @@ def test_get_tags(mock_headers, mock_tags):
     assert response.status_code == 200
     assert response.json() == {"tags": ["tag1", "tag2"]}
 
+
 # Obtener IPs de un tag
 @patch("app.main.api.ip_list_api_mono")
 def test_get_ips(mock_tag):
@@ -38,6 +40,7 @@ def test_get_ips(mock_tag):
     assert response.status_code == 200
     assert response.json() == {"ips": ["ip1", "ip2"]}
 
+
 # Ver los consumos de datos del tag
 @patch("app.main.api.get_usage")
 def test_get_consumos(mock_tag):
@@ -47,3 +50,14 @@ def test_get_consumos(mock_tag):
 
     assert response.status_code == 200
     assert response.json() == {"Uso": ["ID", "status", "uso", "periodo"]}
+
+
+# Ver los limites de datos del tag
+@patch("app.main.api.get_limit")
+def test_get_limites(mock_tag):
+    mock_tag.return_value = ["Usado", "Limite", "Estado"]
+
+    response = client.get("/limites/pedroso")
+
+    assert response.status_code == 200
+    assert response.json() == {"limites": ["Usado", "Limite", "Estado"]}
