@@ -61,8 +61,8 @@ jobs:
             - name: Get the version
               id: get_version
               run: |
-                if [ -s semantic_release_version.txt ]; then
-                    VERSION=$(cat semantic_release_version.txt)
+                VERSION=$(grep -oP "Published release \K.*" semantic_release_output.txt || echo "")
+                if [ -n $"VERSION" ]; then
                     echo "Version found: $VERSION"
                     echo VERSION=$VERSION >> $GITHUB_ENV
                 else  
