@@ -40,7 +40,7 @@ jobs:
             - name: generar version
               id: semantic_release
               env:
-                GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+                TOKEN: ${{ secrets.TOKEN }}
               run: |
                 npx semantic-release --debug | tee semantic_release_output.txt
                 # Si Semantic Release no genera una nueva versión, capturamos la última versión existente
