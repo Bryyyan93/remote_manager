@@ -1,0 +1,73 @@
+name: release-build
+
+on:
+    workflow_run:
+        workflows: ["test"]
+        branches: [ "test" ]
+        types:
+          - completed
+
+permissions:
+    # Permisos necesarios para escribir contenido, paquetes, y leer issues y pull requests
+    contents: write
+    packages: write
+    issues: read
+    pull-requests: read
+
+jobs:
+    semantic-release:
+        if: "${{ github.event.workflow_run.conclusion == 'success' }}"
+        name: Semantic Release
+        runs-on: ubuntu-latest
+        steps:
+            # Clonar repositorio
+            - name: Checkout
+              uses: actions/checkout@v4
+
+            # Obtener el historial completo del repositorio  
+            - name: Unshallow
+              run: git fetch --prune --unshallow
+
+            - name: Install Node.js deps
+              run: |
+                npm ci || npm install
+            
+            # Crear un archivo vacío para almacenar la versión generada por semantic-release    
+            - name: Create empty semantic
+              run: touch semantic_release_version.txt
+        
+            # Ejecutar semantic-release para generar versiones  
+            - name: generar version
+              id: semantic_release
+              env:
+                GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+              run: |
+                npx semantic-release --debug | tee semantic_release_output.txt
+                # Si Semantic Release no genera una nueva versión, capturamos la última versión existente
+                if grep -q "There are no relevant changes, so no new version is released" semantic_release_output.txt; then
+                echo "No new version generated. Fetching the latest version tag."
+                VERSION=$(git describe --tags --abbrev=0)
+                else
+                # Extrae la versión publicada por semantic-release
+                VERSION=$(grep -oP '(?<=Published release ).*' semantic_release_output.txt)
+                echo "$VERSION" > semantic_release_version.txt
+                fi  
+
+            # Verificar el contenido del archivo de versión generado    
+            - name: Debug semantic_release_version.txt
+              run: |
+                ls -l semantic_release_version.txt
+                cat semantic_release_version.txt || echo "File is empty or does not exist"
+
+            # Obtener la versión generada y almacenarla en un entorno    
+            - name: Get the version
+              id: get_version
+              run: |
+                if [ -s semantic_release_version.txt ]; then
+                    VERSION=$(cat semantic_release_version.txt)
+                    echo "Version found: $VERSION"
+                    echo VERSION=$VERSION >> $GITHUB_ENV
+                else  
+                    echo "No version generated"
+                    exit 1
+                fi
