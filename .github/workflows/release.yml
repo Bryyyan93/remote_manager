@@ -20,20 +20,17 @@ jobs:
         name: Semantic Release
         runs-on: ubuntu-latest
         env:
-          GH_TOKEN: ${{ secrets.GH_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
         steps:
             # Clonar repositorio
             - name: Checkout
               uses: actions/checkout@v4
-
-            # Obtener el historial completo del repositorio  
-            - name: Unshallow
-              run: git fetch --prune --unshallow
+              with:
+                fetch-depth: 0
 
             - name: Install Node.js deps
-              run: |
-                npm ci || npm install
+              run: npm install
             
             # Crear un archivo vacío para almacenar la versión generada por semantic-release    
             - name: Create empty semantic
