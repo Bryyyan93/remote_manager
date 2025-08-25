@@ -3,7 +3,7 @@ name: release-build
 on:
     workflow_run:
         workflows: [ "Test and coverage report" ]
-        branches: [ "main" ]
+        branches: [ "develop", "main" ]
         types:
           - completed
 
