@@ -1,15 +1,16 @@
 from . import utils
+from typing import List, Dict, Any
 
 # Configurar logger
 logger = utils.configurar_logger("cmds")
-logs = []
-resultados = [] 
+
 
 ########################################################
 # Funcion para enviar comandos en la consola de SSH
 ########################################################
-def ssh_command(client, cmds, password):
-    resp_cmds = [] 
+def ssh_command(client, cmds, password) -> List[Dict[str, str]]:
+    resp_cmds = []
+    #resp_cmds: List[Dict[str, str]] = []
     try:
         for cmd in cmds:
             logger.info(f"# Ejecutando comando: {cmd}")
@@ -27,41 +28,30 @@ def ssh_command(client, cmds, password):
                 # Ignorar mensajes de sudo no críticos
                 if "sudo" in error or "password for" in error:
                     if "sudo:" in error:
-                        print("# -> error: ")
                         error = str(error).split("sudo:")[1].strip()
-                        logger.error(error)
-                        # Solo agregar a failed_cmds si el comando realmente falló
                         if "command not found" in error or "No such file or directory" in error:
                             logger.error(error)
-                            #failed_cmds.append(cmd)  # Solo agregar comandos fallidos
-                            logs.append(f"# -> Error del comando:\n{error}")
                     else:
                         logger.info("Comando aceptado.!")
                         logger.info("# *****************************************************#")
-                        logs.append(f"# -> Respuesta del comando:\n{salida}")
-
-                    return resp_cmds.append({
-                        "cmd": cmd,
-                        "stdout": salida,
-                        "stderr": error
-                    })
+                        logger.info(f"# -> Respuesta del comando:\n{salida}")
+                resp_cmds.append({
+                    "cmd": cmd,
+                    "stdout": salida,
+                    "stderr": error
+                })      
+        return resp_cmds
     except Exception as e:
         logger.error(f"# Error: Fallo al ejecutar el comando - {e}")
-
-    #return failed_cmds  # Devolver los comandos que fallaron
 
 
 ########################################################
 # Enviar comandos a todas las ips de un tag (Onomono)
 ########################################################
-def command_all_ips(cmds, user, password, ips):
-    respuesta = []
-    # logger.info("# *****************************************************#")
-    # logger.info("# -> IPs a enviar el comando: ")
-    # logger.info(ips)
-    # realizar comprobacion de comando
-    # logger.info("# -> Comandos a enviar:")
-    # logger.info(cmds)
+def command_all_ips(cmds, user, password, ips) -> Dict[str, Any]:
+    # resultados = []
+    resultados: List[Dict[str, Any]] = []
+    logs = []
 
     for ip in ips:
         logger.info("# *****************************************************#")
@@ -70,15 +60,36 @@ def command_all_ips(cmds, user, password, ips):
         client = utils.ssh_authentification(ip, user, password)
 
         # Ejecutar el comando si la conexión fue exitosa
-        if client:
-            exec_cmds = ssh_command(client, cmds, password)
+        if  not client:
+            msg = f"No se puedo establecer conexion ssh en {ip}"
+            logger.error(msg)
             resultados.append({
-                "IP" : ip
+                "ip": ip,
+                "error": msg,
+                "commands": []})
+            logs.append(f"Error: {msg}")
+            continue
+        try:
+            per_ip = ssh_command(client, cmds, password)
+            resultados.append({
+                "ip": ip,
+                "commands": per_ip
             })
+        except Exception as e:
+            msg = f"Fallo ejecutando comandos en {ip}: {e}"
+            logger.error(msg)
+            resultados.append({
+                "ip": ip,
+                "error": str(e),
+                "commands": []
+            })
+        finally:    
             client.close()
-        else:
-            logger.error(f"No se puedo establecer conexion ssh en {ip}")
-        print(f"# Finalizado en: {ip}")
+            fin = f"# Finalizado en: {ip}"
+            logger.info(fin)
+            logs.append(fin)
+
+    return{"status": "ok", "results": resultados, "logs": logs}
 
 def sql_command(password, querys, opc):
     # Para SQL

@@ -84,24 +84,10 @@ def get_limites(tag):
 # Enviar comandos a los dispositivos
 @app.post("/comandos")
 def post_comandos(req: RunCmdReq):
-    logger = logging.getLogger("cmds")
-    buf_handler = _BufferHandler()
-    buf_handler.setFormatter(logging.Formatter('%(asctime)s - %(levelname)s - %(message)s'))
-    out_buf, err_buf = StringIO(), StringIO()
     try:
-        with contextlib.redirect_stdout(out_buf), contextlib.redirect_stderr(err_buf):
-            result = ssh.command_all_ips(req.cmds, req.username, req.password, req.ips)
-
-        return {
-            "status": "ok", 
-            "result": result,
-            "logs": buf_handler.lines,
-            "stdout": out_buf.getvalue(),
-        }
+        return ssh.command_all_ips(req.cmds, req.username, req.password, req.ips)
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
-    finally:
-        logger.removeHandler(buf_handler)
 
 
 ##############################################################

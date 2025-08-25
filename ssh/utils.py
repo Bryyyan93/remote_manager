@@ -34,17 +34,14 @@ def ssh_authentification(ip, user, password):
     # Crear un cliente SSH
     ssh = paramiko.SSHClient()
     ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())  # Aceptar claves de host automáticamente
-    print(f"{user} y {password}")
     try:
         # Conectarse a una máquina remota
         ssh.connect(ip, username=user, password=password)
-        print(f"# Conectado a: {user}@{ip}")
         return ssh
     except paramiko.AuthenticationException:
         print("# Error: Fallo en la autentificación")
     except Exception as e:
         print(f"# Error: Fallo al conectarse: {e}")
-    return None  # Retornar None si no se pudo conectar
 
 
 ########################################################
