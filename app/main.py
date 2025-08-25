@@ -15,8 +15,8 @@ utils.configurar_logger("cmds")
 class RunCmdReq(BaseModel):
     username: str = Field(..., min_length=1)
     password: str = Field(..., min_length=1)
-    cmds: List[str] = Field(..., min_items=1)   # comandos a ejecutar
-    ips: List[str] = Field(..., min_items=1)    # lista de IPs destino
+    cmds: List[str] = Field(..., min_length=1)   # comandos a ejecutar
+    ips: List[str] = Field(..., min_length=1)    # lista de IPs destino
 
 
 class _BufferHandler(logging.Handler):
