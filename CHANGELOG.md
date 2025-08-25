@@ -1,3 +1,11 @@
+## [1.0.1](https://github.com/Bryyyan93/remote_manager/compare/v1.0.0...v1.0.1) (2025-08-25)
+
+
+### Bug Fixes
+
+* omite el paso success del plugin ([9e306f3](https://github.com/Bryyyan93/remote_manager/commit/9e306f3a096ef5d1af52c84105a9da21f9098e04))
+* token de github ([da95f11](https://github.com/Bryyyan93/remote_manager/commit/da95f113a468788e6809a8c559b51f25c8affee0))
+
 # 1.0.0 (2025-08-25)
 
 
