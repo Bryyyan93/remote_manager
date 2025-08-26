@@ -1,3 +1,11 @@
+# [1.1.0](https://github.com/Bryyyan93/remote_manager/compare/v1.0.1...v1.1.0) (2025-08-25)
+
+
+### Features
+
+* cambios en semantic-release ([0a86bd0](https://github.com/Bryyyan93/remote_manager/commit/0a86bd0b97985f1dfb5d097aa705b1e36ec9deff)), closes [#1](https://github.com/Bryyyan93/remote_manager/issues/1)
+* cambios en semantic-release ([3be9346](https://github.com/Bryyyan93/remote_manager/commit/3be934663ca6e5e17cbea1939df4aeb030ab7277))
+
 ## [1.0.1](https://github.com/Bryyyan93/remote_manager/compare/v1.0.0...v1.0.1) (2025-08-25)
 
 
