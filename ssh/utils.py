@@ -1,6 +1,8 @@
+from cryptography.fernet import Fernet
+from dotenv import load_dotenv
+import os
 import paramiko
 import hashlib
-from cryptography.fernet import Fernet
 import logging
 
 
@@ -8,9 +10,9 @@ import logging
 # Hacer el header para la peticion API
 ########################################################
 def api_headers():
-    # Encriptado, hay q usar encript_pass para q funciones y el secret.key correspondiente
-    # idem_noadmin = "gAAAAABnGjh_4L_ze765LFObDR6HLClqZfkjPa9zaaNXML8GHbKSYVF_tdeeFOHcJ-lanq923erPx6T1BCSw2eeevGEBFMygQUeECupa5MiXNdrvxMJEQLb47yOVcXg8-00uTCDgRzK27sNFQJ-77rL4W-FsP5q0je8QxAa7KTs3oKwFdIjQM8A="
-    idem_admin = "gAAAAABn4Qd5tZvTtmcKaHMEmEFPpIlC9nsIq77LsCk5T_Nib2dOVPqsveOrVeS_WTAbHP0QGivXY6Qt32YQwEGUmT0dcSJMl9csUYWmreCmJASBYd2Q7QvhJV_jh1ZpVK6KH0o2i13nkTlnB7Rp3pHNJhlC4TzxQp8pgL4l487Z5ILwahlXiNQ="
+    load_dotenv()  # Cargar variables de entorno desde el archivo .env
+    # idem_noadmin = os.getenv("IDEM_NOADMIN")
+    idem_admin = os.getenv("IDEM_ADMIN")
     # Leer la clave previamente guardada
     with open("./secrets/apisecret_admin.key", "rb") as key_file:
         key = key_file.read()

@@ -51,6 +51,7 @@ Thumbs.db
 # Encript data
 *.key
 encript_pass.py
+.env
 
 # pycache
 __pycache__
