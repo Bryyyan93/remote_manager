@@ -15,66 +15,100 @@ permissions:
     pull-requests: read
 
 jobs:
-    semantic-release:
-        if: "${{ github.event.workflow_run.conclusion == 'success' }}"
-        name: Semantic Release
-        runs-on: ubuntu-latest
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+  semantic-release:
+    if: "${{ github.event.workflow_run.conclusion == 'success' }}"
+    name: Semantic Release
+    runs-on: ubuntu-latest
+    env:
+      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-        steps:
-            # Clonar repositorio
+    steps:
+      # Clonar repositorio
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Install Node.js deps
+        run: npm install
+          
+      # Crear un archivo vacío para almacenar la versión generada por semantic-release    
+      - name: Create empty semantic
+        run: touch semantic_release_version.txt
+  
+      # Ejecutar semantic-release para generar versiones  
+      - name: generar version
+        id: semantic_release
+        run: |
+          npx semantic-release --debug | tee semantic_release_output.txt
+          # Si Semantic Release no genera una nueva versión, capturamos la última versión existente
+          if grep -q "There are no relevant changes, so no new version is released" semantic_release_output.txt; then
+          echo "No new version generated. Fetching the latest version tag."
+          VERSION=$(git describe --tags --abbrev=0)
+          else
+          # Extrae la versión publicada por semantic-release
+          VERSION=$(grep -oP '(?<=Published release ).*' semantic_release_output.txt)
+          echo "$VERSION" > semantic_release_version.txt
+          fi  
+      # Verificar el contenido del archivo de versión generado    
+      - name: Debug semantic_release_version.txt
+        run: |
+          ls -l semantic_release_version.txt
+          cat semantic_release_version.txt || echo "File is empty or does not exist"
+      # Obtener la versión generada y almacenarla en un entorno    
+      - name: Get the version
+        id: get_version
+        run: |
+          VERSION=$(grep -oP "Published release \K.*" semantic_release_output.txt || echo "")
+          if [ -n $"VERSION" ]; then
+              echo "Version found: $VERSION"
+              echo VERSION=$VERSION >> $GITHUB_ENV
+          else  
+              echo "No version generated"
+              exit 1
+          fi
+      - name: Update FastAPI version
+        run: |
+          echo 'VERSION = "'$VERSION'"' > app/version.py
+          git config user.name "semantic-release-bot"
+          git config user.email "semantic-release@github.com"
+          git add app/version.py
+          git commit -m "chore: update FastAPI version to $VERSION [skip ci]" || echo "No changes to commit"
+          git push origin main
+    docker_image:
+      needs: semantic-release
+      runs-on: ubuntu-latest
+      steps:
             - name: Checkout
               uses: actions/checkout@v4
               with:
                 fetch-depth: 0
 
-            - name: Install Node.js deps
-              run: npm install
-            
-            # Crear un archivo vacío para almacenar la versión generada por semantic-release    
-            - name: Create empty semantic
-              run: touch semantic_release_version.txt
+            # Configurar QEMU para construir imágenes Docker multiplataforma      
+            - name: Set up QEMU
+              if: ${{ env.VERSION != '' }}
+              uses: docker/setup-qemu-action@v3   
         
-            # Ejecutar semantic-release para generar versiones  
-            - name: generar version
-              id: semantic_release
-              run: |
-                npx semantic-release --debug | tee semantic_release_output.txt
-                # Si Semantic Release no genera una nueva versión, capturamos la última versión existente
-                if grep -q "There are no relevant changes, so no new version is released" semantic_release_output.txt; then
-                echo "No new version generated. Fetching the latest version tag."
-                VERSION=$(git describe --tags --abbrev=0)
-                else
-                # Extrae la versión publicada por semantic-release
-                VERSION=$(grep -oP '(?<=Published release ).*' semantic_release_output.txt)
-                echo "$VERSION" > semantic_release_version.txt
-                fi  
+            # Configurar Docker Buildx para construir imágenes multiplataforma  
+            - name: Set up Docker Buildx
+              if: ${{ env.VERSION != '' }}
+              uses: docker/setup-buildx-action@v3
 
-            # Verificar el contenido del archivo de versión generado    
-            - name: Debug semantic_release_version.txt
-              run: |
-                ls -l semantic_release_version.txt
-                cat semantic_release_version.txt || echo "File is empty or does not exist"
+            # Iniciar sesión en el contenedor del registro GHCR 
+            - name: Docker Login in GHCR
+              if: ${{ env.VERSION != '' }}
+              uses: docker/login-action@v3
+              id: configure-login-ghcr
+              with:
+                registry: ghcr.io
+                username: ${{ github.actor }}
+                password: ${{ secrets.GITHUB_TOKEN }}
 
-            # Obtener la versión generada y almacenarla en un entorno    
-            - name: Get the version
-              id: get_version
-              run: |
-                VERSION=$(grep -oP "Published release \K.*" semantic_release_output.txt || echo "")
-                if [ -n $"VERSION" ]; then
-                    echo "Version found: $VERSION"
-                    echo VERSION=$VERSION >> $GITHUB_ENV
-                else  
-                    echo "No version generated"
-                    exit 1
-                fi
-
-            - name: Update FastAPI version
-              run: |
-                echo 'VERSION = "'$VERSION'"' > app/version.py
-                git config user.name "semantic-release-bot"
-                git config user.email "semantic-release@github.com"
-                git add app/version.py
-                git commit -m "chore: update FastAPI version to $VERSION [skip ci]" || echo "No changes to commit"
-                git push origin main
+              # Iniciar sesión en Docker Hub    
+            - name: Login to Docker Hub
+              if: ${{ env.VERSION != '' }}
+              uses: docker/login-action@v3
+              id: configure-login-dockerhub
+              with:
+                username: ${{ secrets.DOCKER_USERNAME }}
+                password: ${{ secrets.DOCKER_PASSWORD }}
