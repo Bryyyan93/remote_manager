@@ -2,7 +2,6 @@ import paramiko
 import hashlib
 from cryptography.fernet import Fernet
 import logging
-import tkinter as tk
 
 
 ########################################################
@@ -81,24 +80,3 @@ def configurar_logger(nombre="app", nivel=logging.DEBUG, handler_personalizado=N
             logger.addHandler(handler_personalizado)
 
     return logger
-
-
-class TkinterHandler(logging.Handler):
-    def __init__(self, widget):
-        super().__init__()
-        self.widget = widget
-
-    def emit(self, record):
-        msg = self.format(record)
-        self.widget.after(0, self._insert_text, msg)
-
-    def _insert_text(self, msg):
-        try:
-            if self.widget.winfo_exists():
-                self.widget.config(state="normal")
-                self.widget.insert(tk.END, msg + "\n")
-                self.widget.yview(tk.END)
-                self.widget.config(state="disabled")
-        except tk.TclError:
-            # El widget ya no existe
-            pass
