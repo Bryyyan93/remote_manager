@@ -44,10 +44,7 @@ Para poder trabajar sin problemas se deberá crear un entorno virtual con las de
    ```bash
    pip install -r requirements.txt
    ```
-4. Ejecuta el script principal para iniciar la aplicación:
-   ```bash
-   python main.py
-   ```
+
 ## Estrucura del proyecto
 La estrucrura de los scripts del proyecto, es la siguiente
 ```
@@ -66,26 +63,3 @@ La estrucrura de los scripts del proyecto, es la siguiente
 📁 secrets/
 └── apisecret_admin.key    # Clave para desencriptar el token de autenticación API
 ```
-
-## 🔐 Seguridad
-- El acceso a la API se realiza mediante un token encriptado. Para ello se hace uso del script `encript_pass.py`
-```bash
-from cryptography.fernet import Fernet
-
-# Generar una clave y guardarla para su uso posterior
-key = Fernet.generate_key()
-
-# Guardar la clave en un archivo seguro (esto es importante para poder desencriptar después)
-with open("apisecret.key", "wb") as key_file:
-    key_file.write(key)
-
-# Crear el objeto Fernet con la clave generada
-cipher_suite = Fernet(key)
-
-# La API key que deseas encriptar
-api_key = b"API key"
-# Encriptar la API key
-cipher_text = cipher_suite.encrypt(api_key)
-print(f"API key encriptada: {cipher_text}")
-```
-- Las conexiones SSH requieren usuario, contraseña y se realizan con aceptación automática de claves.
