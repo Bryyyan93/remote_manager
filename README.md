@@ -8,6 +8,8 @@
   - [Instalación local](#instalación-local)
 - [📁 Estructura del proyecto](#estrucura-del-proyecto)
 - [🧪 Testing](#testing)
+- [Servidor web](#servidor-web)
+- [Integración continua](#continuous-integration)
 
 ## Descripción
 **remote_manager** es una aplicación desarrollada en **Python** que permite la gestión remota de cabeceras. 
@@ -135,5 +137,34 @@ docker run -p 8000:8000 -v $(pwd)/secrets:/app/secrets:ro remote-cmds:dev
      * Así se coloca en la raíz de tu proyecto, $(pwd)/secrets apunta a la carpeta secrets/ donde se tiene `apisecret_admin.key`.
 
 <p align="center">
-    <img src="./docs/Docker/docker_run.png" alt="Docker run" width="800"/>
+    <img src="./docs/ci/docker_run.png" alt="Docker run" width="800"/>
 </p>
+
+## Continuous Integration
+Se han creado pipelines en Github Actions para automátizar procesos, para ello se han creado distintos workflows en los que se lanza los distintos procesos.
+1. Test
+En este worflow `test.yml` ejecuta:
+- Linter (`flake8`)
+<p align="left">
+    <img src="./docs/ci/flake8.png" alt="flake 8" width="200"/>
+</p>  
+
+- test (`pytest` + `coverage`)
+<p align="left">
+    <img src="./docs/ci/pytest.png" alt="pytest" width="500"/>
+</p>  
+<p align="left">
+    <img src="./docs/ci/coverage.png" alt="coverage" width="500"/>
+</p>  
+
+Así se valida el código automáticamente en cada cambio que se haga.  
+
+2. Semantic Release  
+El el workflow `release-build.yml` que solo se realiza en la rama `main`
+- Analiza los commits
+- Genera una versión (v1.0.0, v1.1.0, etc.)
+- Actualiza CHANGELOG.md, package-lock.json
+- Hace push al repo con los cambios generados
+<p align="left">
+    <img src="./docs/ci/release.png" alt="releasse" width="150"/>
+</p>  
