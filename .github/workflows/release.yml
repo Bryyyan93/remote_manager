@@ -69,3 +69,12 @@ jobs:
                     echo "No version generated"
                     exit 1
                 fi
+
+            - name: Update FastAPI version
+              run: |
+                echo 'VERSION = "'$VERSION'"' > app/version.py
+                git config user.name "semantic-release-bot"
+                git config user.email "semantic-release@github.com"
+                git add app/version.py
+                git commit -m "chore: update FastAPI version to $VERSION [skip ci]" || echo "No changes to commit"
+                git push origin main

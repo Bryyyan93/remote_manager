@@ -1,12 +1,12 @@
 # app/main.py
-import logging
 from fastapi import FastAPI, HTTPException
 from typing import List
 from pydantic import BaseModel, Field
 from api_onomondo import onomondo
 from ssh import utils, api_petitions as api, comandos_ssh as ssh
+from app.version import VERSION
 
-app = FastAPI(title="Remote Manager", version="1.1.0")
+app = FastAPI(title="Remote Manager", version=VERSION)
 
 utils.configurar_logger("cmds")
 
