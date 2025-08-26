@@ -1,1 +1,1 @@
-VERSION = "0.0.0"  # valor inicial placeholder
+VERSION = "1.2.0 on default channel"
