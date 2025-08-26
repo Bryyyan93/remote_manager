@@ -1,3 +1,10 @@
+# [1.3.0](https://github.com/Bryyyan93/remote_manager/compare/v1.2.0...v1.3.0) (2025-08-26)
+
+
+### Features
+
+* añadir instrucciones para crear una imagen docker ([05d0b8a](https://github.com/Bryyyan93/remote_manager/commit/05d0b8a5dc517b61e2a6ecaf392079b6711968d7))
+
 # [1.2.0](https://github.com/Bryyyan93/remote_manager/compare/v1.1.0...v1.2.0) (2025-08-26)
 
 
