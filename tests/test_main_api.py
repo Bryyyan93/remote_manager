@@ -18,15 +18,22 @@ def test_root():
 # GUI_API
 ##############################################################
 # Obtener tags de las instalaciones
-@patch("app.main.onomondo.get_tags")
-@patch("app.main.utils.api_headers")
+# Usamos el decorador @patch para simular (mockear) funciones concretas.
+@patch("app.main.onomondo.get_tags")  # Simula la función get_tags() que obtiene los tags desde la API
+@patch("app.main.utils.api_headers")  # Simula la función api_headers() que crea los headers de autenticación
+# La función de test recibe los mocks como argumentos (en orden inverso)
 def test_get_tags(mock_headers, mock_tags):
+    # Simulamos que api_headers() devuelve un diccionario de autorización falso
     mock_headers.return_value = {'authorization': "fake"}
+    # Simulamos que get_tags() devuelve una lista de tags estática
     mock_tags.return_value = ["tag1", "tag2"]
 
+    # Usamos un cliente de pruebas (TestClient) para hacer una petición HTTP GET a la ruta "/tags"
     response = client.get("/tags")
 
+    # Verificamos que la respuesta tenga codigo 200
     assert response.status_code == 200
+    # Verificamos que el JSON devuelto sea el esperado
     assert response.json() == {"tags": ["tag1", "tag2"]}
 
 

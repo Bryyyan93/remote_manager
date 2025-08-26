@@ -6,7 +6,7 @@ from pydantic import BaseModel, Field
 from api_onomondo import onomondo
 from ssh import utils, api_petitions as api, comandos_ssh as ssh
 
-app = FastAPI(title="Remote Manager", version="0.1.0")
+app = FastAPI(title="Remote Manager", version="1.1.0")
 
 utils.configurar_logger("cmds")
 
@@ -17,17 +17,6 @@ class RunCmdReq(BaseModel):
     password: str = Field(..., min_length=1)
     cmds: List[str] = Field(..., min_length=1)   # comandos a ejecutar
     ips: List[str] = Field(..., min_length=1)    # lista de IPs destino
-
-
-class _BufferHandler(logging.Handler):
-    """Handler que guarda los logs formateados en una lista."""
-    def __init__(self):
-        super().__init__()
-        self.lines: List[str] = []
-
-    def emit(self, record):
-        msg = self.format(record)
-        self.lines.append(msg)
 
 
 # Pantalla principla
