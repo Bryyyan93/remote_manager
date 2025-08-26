@@ -1,3 +1,16 @@
+# [1.4.0](https://github.com/Bryyyan93/remote_manager/compare/v1.3.0...v1.4.0) (2025-08-26)
+
+
+### Bug Fixes
+
+* añadir documentacion ([1301fb1](https://github.com/Bryyyan93/remote_manager/commit/1301fb176864ee7ea23bfa61b17baa5dd201588b))
+* añadir pipeline para docker ([f6df9dc](https://github.com/Bryyyan93/remote_manager/commit/f6df9dcb900af15d255f438ef9ece52a92630f3f))
+
+
+### Features
+
+* pipelines para subida a los dockerhub y ghcr ([b3adb15](https://github.com/Bryyyan93/remote_manager/commit/b3adb15e94ceb295293e0c04332cdcb6b6ca7b84))
+
 # [1.3.0](https://github.com/Bryyyan93/remote_manager/compare/v1.2.0...v1.3.0) (2025-08-26)
 
 
