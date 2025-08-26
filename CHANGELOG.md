@@ -1,3 +1,19 @@
+# [1.2.0](https://github.com/Bryyyan93/remote_manager/compare/v1.1.0...v1.2.0) (2025-08-26)
+
+
+### Bug Fixes
+
+* añadir documentacion ([25b8dc8](https://github.com/Bryyyan93/remote_manager/commit/25b8dc858f413b1e6ef375172e6a66da0f40a0a5))
+* añadir rama al test ([347bf27](https://github.com/Bryyyan93/remote_manager/commit/347bf27291c22604b9ceb1eefbbf447a4eaa388a))
+* arreglos para flake8 ([1d39951](https://github.com/Bryyyan93/remote_manager/commit/1d399514339b4a753f82cffa7ec66745800b5abf))
+* problema con pipeline ([ed97729](https://github.com/Bryyyan93/remote_manager/commit/ed977298ee9bc53221186e49972e660deb4ebf9b))
+
+
+### Features
+
+* añadir cambio automatico en la version de fastapi ([4e9955e](https://github.com/Bryyyan93/remote_manager/commit/4e9955e211bb404d9f62c02ef3562bc1f7778c78))
+* Merge branch 'develop' ([86c9b4c](https://github.com/Bryyyan93/remote_manager/commit/86c9b4ce49b25f44ffa6d4b557fe2c8fd813a975))
+
 # [1.1.0](https://github.com/Bryyyan93/remote_manager/compare/v1.0.1...v1.1.0) (2025-08-25)
 
 
