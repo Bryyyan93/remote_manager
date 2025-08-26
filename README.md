@@ -128,13 +128,25 @@ docker build -t remote-cmds:dev .
 ```  
 - Correr la imagen:
 ```sh
-docker run -p 8000:8000 -v $(pwd)/secrets:/app/secrets:ro remote-cmds:dev
+docker run \
+  -p 8000:8000 \
+  -v $(pwd)/secrets:/app/secrets:ro \
+  -e IDEM_ADMIN="gAAAAABk...." \
+  remote-cmds:dev
 ```
-- `-v $(pwd)/secrets:/app/secrets:ro`: es una opción de `docker run` para montar un volumen (es decir, enlazar un directorio de la máquina al contenedor).
+- `-v $(pwd)/secrets:/app/secrets:ro`: es una opción de `docker run` para montar un volumen (es decir, enlazar un directorio de la máquina al contenedor).  
+   * `-v <origen>:<destino>:<modo>`
    * `-v` → “volume”, montar algo en el contenedor.
    * `$(pwd)/secrets` → ruta en la máquina host.
      * `$(pwd)` significa “current working directory” (directorio actual).
      * Así se coloca en la raíz de tu proyecto, $(pwd)/secrets apunta a la carpeta secrets/ donde se tiene `apisecret_admin.key`.
+   * `/app/secrets` → Esa carpeta se monta dentro del contenedor
+   * `ro` → De forma opcional, se puede hacerl solo lectura (`ro`) o lectura/escritura (`rw`).
+
+Si estuviera en otra ruta se usaría, por ejemplo `~/Documentos/miclave/`:
+  ```sh
+  -v /home/usuario/Documentos/miclave:/app/secrets:ro
+  ```
 
 <p align="center">
     <img src="./docs/ci/docker_run.png" alt="Docker run" width="800"/>
