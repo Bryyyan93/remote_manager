@@ -60,19 +60,6 @@ jobs:
           ls -l semantic_release_version.txt
           cat semantic_release_version.txt || echo "File is empty or does not exist"
 
-      # Obtener la versión generada y almacenarla en un entorno    
-      - name: Get version
-        id: get_version
-        run: |
-          VERSION=$(grep -oP "Published release \K.*" semantic_release_output.txt || echo "")
-          if [ -n $"VERSION" ]; then
-            echo "Version found: $VERSION"
-            echo VERSION=$VERSION >> $GITHUB_ENV
-          else  
-            echo "No version generated"
-            exit 1
-          fi
-
       - name: Update FastAPI version
         run: |
           echo 'VERSION = "'$VERSION'"' > app/version.py
