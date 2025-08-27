@@ -1,3 +1,11 @@
+## [1.5.7](https://github.com/Bryyyan93/remote_manager/compare/v1.5.6...v1.5.7) (2025-08-27)
+
+
+### Bug Fixes
+
+* acceder a la interfaz tkinter ([41be410](https://github.com/Bryyyan93/remote_manager/commit/41be4106b4e2c63a0df61bb7a0c4769cf0350aea))
+* corregir flake8 ([bd2f516](https://github.com/Bryyyan93/remote_manager/commit/bd2f5164de6b7cfb59bb64880e40ae4fd1fe28a8))
+
 ## [1.5.6](https://github.com/Bryyyan93/remote_manager/compare/v1.5.5...v1.5.6) (2025-08-27)
 
 
