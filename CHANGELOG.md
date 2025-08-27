@@ -1,3 +1,12 @@
+## [1.5.6](https://github.com/Bryyyan93/remote_manager/compare/v1.5.5...v1.5.6) (2025-08-27)
+
+
+### Bug Fixes
+
+* corregir error de no version en version.py ([08afa80](https://github.com/Bryyyan93/remote_manager/commit/08afa80364bd3494c164c5c0c75fa1b83b7ec85f))
+* corregir error de no version en version.py ([7edc2f0](https://github.com/Bryyyan93/remote_manager/commit/7edc2f0cd6e79591717c16ab7fcdfbf8d143dfff))
+* corregir error de no version en version.py ([53780e0](https://github.com/Bryyyan93/remote_manager/commit/53780e05a177c33378ca761b4a5e8b55d575b494))
+
 ## [1.5.5](https://github.com/Bryyyan93/remote_manager/compare/v1.5.4...v1.5.5) (2025-08-27)
 
 
