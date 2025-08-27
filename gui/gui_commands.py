@@ -24,18 +24,6 @@ def obtener_tags():
 
 
 ########################################################
-# Funicion que obtiene las ips online
-########################################################
-def obtener_ips(tag):
-    # crea la instancia  para poder llamar a la api
-    headers = utils.api_headers()
-    # pide la lista de ips, y almacena las online en data
-    data = petition.ip_list_api_mono(headers, tag)
-
-    return data
-
-
-########################################################
 # Funicion que abre una emergente para la seleccion de las ips
 ########################################################
 def abrir_emergente_ips(callback):
@@ -144,7 +132,7 @@ def abrir_emergente_tags(callback):
         todas_las_ips = []  # Lista para almacenar las IPs obtenidas
         for tag in seleccionadas:
             try:
-                ips = obtener_ips(tag)
+                ips = petition.ip_list_api_mono(tag)
                 # Añadir las IPs
                 todas_las_ips.extend(ips)
             except Exception as e:

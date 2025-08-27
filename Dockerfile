@@ -12,6 +12,9 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     build-essential libffi-dev libssl-dev \
  && rm -rf /var/lib/apt/lists/*
 
+# Paquetes necesarios para tkinter (si usas GUI)
+RUN apt-get update && apt-get install -y python3-tk tk-dev
+
 # Directorio de la app
 WORKDIR /app
 

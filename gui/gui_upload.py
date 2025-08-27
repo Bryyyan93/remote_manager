@@ -6,18 +6,6 @@ import tkinter as tk
 import logging
 
 
-########################################################
-# Funicion que obtiene las ips online
-########################################################
-def obtener_ips(tag):
-    # crea la instancia  para poder llamar a la api
-    headers = utils.api_headers()
-
-    data = petition.ip_list_api_mono(headers, tag)
-
-    return data
-
-
 ##############################################################################
 # Abre una ventana emergente para seleccionar IPs manualmente o desde API,
 # según la opción seleccionada en el menú desplegable.
@@ -177,7 +165,7 @@ def abrir_modal_taglist(callback):
         todas_las_ips = []  # Lista para almacenar las IPs obtenidas
         for tag in seleccionadas:
             try:
-                ips = obtener_ips(tag)
+                ips = petition.ip_list_api_mono(tag)
                 # Añadir las IPs
                 todas_las_ips.extend(ips)
             except Exception as e:
