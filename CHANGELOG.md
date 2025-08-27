@@ -1,3 +1,15 @@
+# [1.5.0](https://github.com/Bryyyan93/remote_manager/compare/v1.4.0...v1.5.0) (2025-08-27)
+
+
+### Bug Fixes
+
+* añadir version ([18c81f2](https://github.com/Bryyyan93/remote_manager/commit/18c81f27b4f505b7ae57213c0afcad3379c5bcd9))
+
+
+### Features
+
+* añadir variables de entorno para las headers ([0a97c12](https://github.com/Bryyyan93/remote_manager/commit/0a97c12a6a1ac15108ad112e6c554368d6e9e984))
+
 # [1.4.0](https://github.com/Bryyyan93/remote_manager/compare/v1.3.0...v1.4.0) (2025-08-26)
 
 
