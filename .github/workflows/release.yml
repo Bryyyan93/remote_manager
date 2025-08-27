@@ -45,13 +45,13 @@ jobs:
           npx semantic-release --debug | tee semantic_release_output.txt
           # Si Semantic Release no genera una nueva versión, capturamos la última versión existente
           if grep -q "There are no relevant changes, so no new version is released" semantic_release_output.txt; then
-          echo "No new version generated. Fetching the latest version tag."
-          VERSION=$(git describe --tags --abbrev=0)
+            echo "No new version generated. Fetching the latest version tag."
+            VERSION=$(git describe --tags --abbrev=0)
           else
-          # Extrae la versión publicada por semantic-release
-          VERSION=$(grep -oP '(?<=Published release ).*' semantic_release_output.txt)
-          echo "$VERSION" > semantic_release_version.txt
-          fi  
+            # Limpiar y extraer solo la versión
+            VERSION=$(grep -oP '(?<=Published release )[^ ]+' semantic_release_output.txt)
+          fi
+          echo "$VERSION" > semantic_release_version.txt  
 
       # Verificar el contenido del archivo de versión generado    
       - name: Debug semantic_release_version.txt
@@ -65,11 +65,11 @@ jobs:
         run: |
           VERSION=$(grep -oP "Published release \K.*" semantic_release_output.txt || echo "")
           if [ -n $"VERSION" ]; then
-              echo "Version found: $VERSION"
-              echo VERSION=$VERSION >> $GITHUB_ENV
+            echo "Version found: $VERSION"
+            echo VERSION=$VERSION >> $GITHUB_ENV
           else  
-              echo "No version generated"
-              exit 1
+            echo "No version generated"
+            exit 1
           fi
 
       - name: Update FastAPI version
