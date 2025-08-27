@@ -79,17 +79,6 @@ jobs:
           git commit -m "chore: update FastAPI version to $VERSION [skip ci]" || echo "No changes to commit"
           git push origin main
 
-          # También hacer push a develop si existe
-          if git ls-remote --exit-code --heads origin develop; then
-            git checkout develop
-            git merge main --ff-only
-            git push origin develop
-          else
-            echo "Branch 'develop' does not exist on remote. Skipping push."
-          fi
-
-          git checkout main
-
   docker_image:
     needs: semantic-release
     runs-on: ubuntu-latest
