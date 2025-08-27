@@ -71,13 +71,28 @@ jobs:
 
       - name: Update FastAPI version
         run: |
-          VERSION=$(cat semantic_release_version.txt)
-          echo 'VERSION = "'$VERSION'"' > app/version.py
-          git config user.name "semantic-release-bot"
-          git config user.email "semantic-release@github.com"
-          git add app/version.py
-          git commit -m "chore: update FastAPI version to $VERSION [skip ci]" || echo "No changes to commit"
-          git push origin main
+          if [ -s semantic_release_version.txt ]; then
+            echo "semantic_release_version.txt is not empty, updating version.py"
+            VERSION=$(cat semantic_release_version.txt)
+            echo 'VERSION = "'$VERSION'"' > app/version.py
+            git config user.name "semantic-release-bot"
+            git config user.email "semantic-release@github.com"
+            git add app/version.py
+            git commit -m "chore: update FastAPI version to $VERSION [skip ci]" || echo "No changes to commit"
+            git push origin main
+
+            if git ls-remote --exit-code --heads develop; then
+              git fetch origin develop
+              git checkout develop
+              git merge main --ff-only || echo "No fast-forward posiible"
+              git push origin develop
+            else
+              echo "Branch 'develop' does not exist, skipping merge"
+            fi
+            git checkout main    
+          else
+            echo "semantic_release_version.txt is empty, skipping version.py update"
+          fi  
 
   docker_image:
     needs: semantic-release
