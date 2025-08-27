@@ -49,8 +49,9 @@ jobs:
             VERSION=$(git describe --tags --abbrev=0)
           else
             # Limpiar y extraer solo la versión
-            VERSION=$(grep -oP "(?<=Published release )[^ ]+" semantic_release_output.txt || echo "")
+            VERSION=$(grep -Po "\[semantic-release\].*Published release \K([0-9]+\.[0-9]+\.[0-9]+)" semantic_release_output.txt || echo "")
           fi
+          echo "Version extracted: $VERSION"
           echo "$VERSION" > semantic_release_version.txt  
 
       # Verificar el contenido del archivo de versión generado    
