@@ -81,7 +81,7 @@ jobs:
             git commit -m "chore: update FastAPI version to $VERSION [skip ci]" || echo "No changes to commit"
             git push origin main
 
-            if git ls-remote --exit-code --heads develop; then
+            if git ls-remote --exit-code --heads origin develop; then
               git fetch origin develop
               git checkout develop
               git merge main --ff-only || echo "No fast-forward posiible"
