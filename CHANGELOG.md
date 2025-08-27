@@ -1,3 +1,10 @@
+## [1.5.4](https://github.com/Bryyyan93/remote_manager/compare/v1.5.3...v1.5.4) (2025-08-27)
+
+
+### Bug Fixes
+
+* quitar get version ([7befd6a](https://github.com/Bryyyan93/remote_manager/commit/7befd6ad4d570ded58c13ddef21fd6b58d05421b))
+
 ## [1.5.3](https://github.com/Bryyyan93/remote_manager/compare/v1.5.2...v1.5.3) (2025-08-27)
 
 
