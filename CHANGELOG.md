@@ -1,3 +1,10 @@
+## [1.5.2](https://github.com/Bryyyan93/remote_manager/compare/v1.5.1...v1.5.2) (2025-08-27)
+
+
+### Bug Fixes
+
+* arreglar la captura de version ([59085d7](https://github.com/Bryyyan93/remote_manager/commit/59085d7f6d6008ec179f40a659c498c718f43d5d))
+
 ## [1.5.1](https://github.com/Bryyyan93/remote_manager/compare/v1.5.0...v1.5.1) (2025-08-27)
 
 
