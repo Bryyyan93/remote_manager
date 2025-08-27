@@ -38,7 +38,7 @@ def mostrar_pantalla(frame):
 
 # --- Interfaz Gráfica ---
 ventana = tk.Tk()
-ventana.title("Comandos SSH para SIMs")
+ventana.title("Remote Manager")
 ventana.geometry("700x600")
 
 # Contenedor que aloja todas las pantallas (frames)

@@ -9,6 +9,7 @@
 - [📁 Estructura del proyecto](#estrucura-del-proyecto)
 - [🧪 Testing](#testing)
 - [Servidor web](#servidor-web)
+- [Interfaz de escritorio](#interfaz-de-escritorio)
 - [Integración continua](#continuous-integration)
 
 ## Descripción
@@ -150,6 +151,16 @@ Si estuviera en otra ruta se usaría, por ejemplo `~/Documentos/miclave/`:
 
 <p align="center">
     <img src="./docs/ci/docker_run.png" alt="Docker run" width="800"/>
+</p>
+
+## Interfaz de escritorio
+Se ha desarrollado una interfaz de escritorio para acceder a las herramientas sin necesidad de levantar los servicios web.
+Para acceder a esta interfaz se ejecuta:
+```sh
+python .\main_gui.py
+```
+<p align="left">
+    <img src="./docs/gui/Tkinter_main.png" alt="Pantalla principal Tkinter" width="500"/>
 </p>
 
 ## Continuous Integration
