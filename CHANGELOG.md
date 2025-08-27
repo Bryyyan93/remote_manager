@@ -1,3 +1,12 @@
+## [1.5.5](https://github.com/Bryyyan93/remote_manager/compare/v1.5.4...v1.5.5) (2025-08-27)
+
+
+### Bug Fixes
+
+* exportar version ([5729865](https://github.com/Bryyyan93/remote_manager/commit/5729865f906c321ddec1115b58fe3dfbd040bf16))
+* exportar version ([412e883](https://github.com/Bryyyan93/remote_manager/commit/412e883c442b331b0c8f416a10ef336da7b40060))
+* Merge branch 'main' of https://github.com/Bryyyan93/remote_namager ([2db5b45](https://github.com/Bryyyan93/remote_manager/commit/2db5b4599682eb9abbb59b9c10cdbd333b7bddbc))
+
 ## [1.5.4](https://github.com/Bryyyan93/remote_manager/compare/v1.5.3...v1.5.4) (2025-08-27)
 
 
