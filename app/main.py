@@ -49,7 +49,8 @@ def get_ips(tag):
         return {"ips": ips}
     except Exception as e:
         raise HTTPException(500, detail=str(e))
-    
+
+
 # Obtener IPs online y offline de un tag
 @app.get("/all_ips/{tag}")
 def get_all_ips(tag):
@@ -58,6 +59,7 @@ def get_all_ips(tag):
         return all_ips
     except Exception as e:
         raise HTTPException(500, detail=str(e))
+
 
 # Ver los consumos de datos del tag
 @app.get("/consumos/{tag}")

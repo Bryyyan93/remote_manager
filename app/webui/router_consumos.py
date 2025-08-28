@@ -2,7 +2,9 @@
 from fastapi import APIRouter, Request, HTTPException
 from fastapi.responses import HTMLResponse
 from fastapi.templating import Jinja2Templates
-import httpx, os, re
+import httpx
+import os
+import re
 
 
 router = APIRouter(prefix="/ui", tags=["ui"])

@@ -2,16 +2,15 @@
 from fastapi import APIRouter, Request, HTTPException
 from fastapi.responses import HTMLResponse
 from fastapi.templating import Jinja2Templates
-import httpx, os, re
-
+import httpx
+import os
+import re, ast
 
 router = APIRouter(prefix="/ui", tags=["ui"])
 templates = Jinja2Templates(directory="./app/templates")
 # URL del backend.
 BACKEND_URL = os.environ.get("UI_BACKEND_URL", "http://localhost:8000")
 
-
-import re, ast
 
 def _parse_ips_payload(payload):
     """
@@ -133,4 +132,4 @@ async def ui_ips_list(request: Request, tag: str):
 
     ips = _parse_ips_payload(data)
     return templates.TemplateResponse("_ips_list.html",
-        {"request": request, "ips": ips, "error": None, "tag": tag})
+                                      {"request": request, "ips": ips, "error": None, "tag": tag})
