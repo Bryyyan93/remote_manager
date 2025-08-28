@@ -26,6 +26,18 @@
     th { text-align:left; color:#cbd5e1; font-weight:600; }
     .error { color:#fca5a5; background:#450a0a; border:1px solid #7f1d1d; padding:.6rem .8rem; border-radius:.6rem; }
     .toolbar { display:flex; gap:.5rem; align-items:center; flex-wrap:wrap; }
+
+    /* Colores para limites*/
+    .badge{display:inline-block;padding:.15rem .45rem;border-radius:.45rem;border:1px solid transparent}
+    .badge.ok{background:#052e16;border-color:#14532d;color:#86efac}          /* Límite no alcanzado = verde */
+    .badge.near{background:#3a1d06;border-color:#a16207;color:#fcd34d}       /* Límite cercano = ámbar */
+    .badge.warn{background:#451a03;border-color:#92400e;color:#fcd34d}       /* Límite alcanzado = amarillo */
+    .badge.danger{background:#450a0a;border-color:#7f1d1d;color:#fecaca}     /* Límite superado = rojo */
+
+    /* Colores Estado de conexion*/
+    .status{display:inline-block;padding:.15rem .45rem;border-radius:.45rem;border:1px solid transparent}
+    .status.on{background:#052e16;border-radius:.4rem;color:#86efac}
+    .status.off{background:#450a0a;border-radius:.4rem;color:#fecaca}
   </style>
 
   {% block head %}{% endblock %}

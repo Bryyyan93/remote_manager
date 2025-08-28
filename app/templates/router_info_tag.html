@@ -1,8 +1,8 @@
 {% extends "base.html" %}
-{% block title %}Consumos por tag{% endblock %}
+{% block title %}Informacion por tag{% endblock %}
 
 {% block body %}
-  <h1 style="margin-bottom:1rem;">Consumos por tag</h1>
+  <h1 style="margin-bottom:1rem;">Informacion por tag</h1>
 
   {% if error %}
   <div class="error" style="margin-bottom:1rem;">{{ error }}</div>
@@ -20,7 +20,7 @@
       <!-- Botón “Ver datos”: hace GET a /ui/consumos/_list?tag=.... y pinta el parcial -->
       <button
         class="btn primary"
-        hx-get="/ui/consumos/_list"
+        hx-get="/ui/info_tag/_tabla"
         hx-target="#resultado"
         hx-indicator="#cargando"
         hx-include="#tag"

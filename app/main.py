@@ -5,12 +5,11 @@ from pydantic import BaseModel, Field
 from api_onomondo import onomondo
 from ssh import utils, api_petitions as api, comandos_ssh as ssh
 from app.version import VERSION
-from app.webui.router_consumos import router as ui_router
-from app.webui.router_ips import router as ips_router
+from app.webui.router_info_tag import router as ui_router
+
 
 app = FastAPI(title="Remote Manager", version=VERSION)
 app.include_router(ui_router)
-app.include_router(ips_router)
 utils.configurar_logger("cmds")
 
 

@@ -1,0 +1,59 @@
+{% if error %}
+  <div class="error">{{ error }}</div>
+{% else %}
+  {% if rows and rows|length > 0 %}
+    <h3 style="margin-top:0;">Resultados{% if tag %} — {{ tag }}{% endif %}</h3>
+    <table>
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>IP</th>
+          <th>Uso (MB)</th>
+          <th>Límite (MB)</th>
+          <th>Estado</th>
+          <th>Periodo</th>
+          <th>Conexión</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for r in rows %}
+          <tr>
+            <td>{{ r.id }}</td>
+            <td>{{ r.ip or "-" }}</td>
+            <td>{{ r.usage_mb or "-" }}</td>
+            <td>{{ r.limit_mb if r.limit_mb is not none else "-" }}</td>
+            <td>
+              {% set s = (r.limit_state or r.estado or '-')|lower %}
+              {% if 'superado' in s %}
+                <span class="badge danger">Límite superado</span>
+              {% elif 'alcanzado' in s and 'no' not in s %}
+                <span class="badge warn">Límite alcanzado</span>
+              {% elif 'cercano' in s %}
+                <span class="badge near">Límite cercano</span>
+              {% else %}
+                <span class="badge ok">Límite no alcanzado</span>
+              {% endif %}
+            </td>
+            <td>{{ r.period }}</td>
+            <td>
+              {% set s = (r.conn_state or "-")|lower %}
+              {% if "online" in s %}
+                <span class="status on">online</span>
+              {% elif "offline" in s %}
+                <span class="status off">online</span>
+              {% else %}
+                <span class="muted">-</span>
+              {% endif %}
+            </td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  {% elif raw %}
+    <h3 style="margin-top:0;">Resultados (formato no estándar)</h3>
+    <pre style="white-space: pre-wrap;">{{ raw | tojson(indent=2) }}</pre>
+    <p class="muted">Se mostró la respuesta sin transformar porque el esquema no coincide con <code>id/status/usage_mb/period</code>.</p>
+  {% else %}
+    <p class="muted">No hay datos para este tag.</p>
+  {% endif %}
+{% endif %}
