@@ -56,7 +56,7 @@ def test_get_consumos(mock_tag):
     response = client.get("/consumos/pedroso")
 
     assert response.status_code == 200
-    assert response.json() == {"Uso": ["ID", "status", "uso", "periodo"]}
+    assert response.json() == {"consumos": ["ID", "status", "uso", "periodo"]}
 
 
 # Ver los limites de datos del tag
