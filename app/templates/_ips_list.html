@@ -1,0 +1,35 @@
+{% if error %}
+  <div class="error">{{ error }}</div>
+{% else %}
+  {% if ips and ips|length > 0 %}
+    <h3 style="margin-top:0;">IPs — {{ tag }}</h3>
+    <table>
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>IP</th>
+          <th>Estado</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for i in ips %}
+          <tr>
+            <td>{{ i.id }}</td>
+            <td>{{ i.ip }}</td>
+            <td>
+              {% if i.estado == 'online' %}
+                <span style="padding:.15rem .45rem;border:1px solid #14532d;background:#052e16;border-radius:.4rem;color:#86efac;">online</span>
+              {% elif i.estado == 'offline' %}
+                <span style="padding:.15rem .45rem;border:1px solid #7f1d1d;background:#450a0a;border-radius:.4rem;color:#fecaca;">offline</span>
+              {% else %}
+                <span class="muted">-</span>
+              {% endif %}
+            </td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  {% else %}
+    <span class="muted">No hay IPs para {{ tag }}.</span>
+  {% endif %}
+{% endif %}

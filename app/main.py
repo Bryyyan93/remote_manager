@@ -5,9 +5,12 @@ from pydantic import BaseModel, Field
 from api_onomondo import onomondo
 from ssh import utils, api_petitions as api, comandos_ssh as ssh
 from app.version import VERSION
+from app.webui.router_consumos import router as ui_router
+from app.webui.router_ips import router as ips_router
 
 app = FastAPI(title="Remote Manager", version=VERSION)
-
+app.include_router(ui_router)
+app.include_router(ips_router)
 utils.configurar_logger("cmds")
 
 
@@ -38,7 +41,7 @@ def get_tags():
         raise HTTPException(500, detail=str(e))
 
 
-# Obtener IPs de un tag
+# Obtener lista de IPs online de un tag
 @app.get("/ips/{tag}")
 def get_ips(tag):
     try:
@@ -46,14 +49,22 @@ def get_ips(tag):
         return {"ips": ips}
     except Exception as e:
         raise HTTPException(500, detail=str(e))
-
+    
+# Obtener IPs online y offline de un tag
+@app.get("/all_ips/{tag}")
+def get_all_ips(tag):
+    try:
+        all_ips = onomondo.get_ips_status(utils.api_headers(), tag)
+        return all_ips
+    except Exception as e:
+        raise HTTPException(500, detail=str(e))
 
 # Ver los consumos de datos del tag
 @app.get("/consumos/{tag}")
 def get_consumos(tag):
     try:
         consumos = api.get_usage(tag)
-        return {"Uso": consumos}
+        return {"consumos": consumos}
     except Exception as e:
         raise HTTPException(500, detail=str(e))
 
