@@ -101,25 +101,38 @@ def test_get_tags(mock_headers, mock_tags):
 - Es un test de unidad de un endpoint: verifica que `/tags` responde como debe.
 
 ## Servidor web
-Para el servicio web se ga usado Uvicorn que es un servidor web rápido y asíncrono para aplicaciones Python, 
+Para el servicio web se ha usado Uvicorn que es un servidor web rápido y asíncrono para aplicaciones Python, 
 especialmente diseñado para ser usado con frameworks como FastAPI. Actúa como un puente entre tu aplicación 
 web y las conexiones de red, permitiendo que tu código Python se ejecute de manera eficiente.   
 
-Se ejecuta de la siguiente manera
+Se ejecuta de la siguiente manera:
 ```sh
 uvicorn app.main:app --reload
 ```  
 <p align="center">
-    <img src="./docs/FastAPI/uvicorn_cli.png" alt="uviconr_cli" width="800"/>
+    <img src="./docs/FastAPI_UI_web/uvicorn_cli.png" alt="uviconr_cli" width="800"/>
 </p>  
 
 Se accede a la interfaz web por la IP que se nos indica:
 ```sh
-http://127.0.0.1:8000/docs 
+http://localhost:8000/docs 
 ```  
 <p align="center">
-    <img src="./docs/FastAPI/uvicorn_gui.png" alt="uviconr_gui" width="800"/>
+    <img src="./docs/FastAPI_UI_web/uvicorn_gui.png" alt="uviconr_gui" width="800"/>
 </p>
+
+### UI web (FastAPI + Jinja2 + HTMX)
+Esta UI añade pantallas web que consultan por HTTP interno los endpoints existentes y pintan una tabla con la 
+información de cada SIM por tag: ID, IP, uso (MB), límite de datos (MB), período, estado de conexión.
+Para acceder a la interfáz se hara de la siguiente manera:
+```sh
+http://localhost:8000/ui/info_tag
+```
+<p align="center">
+    <img src="./docs/FastAPI_UI_web/datos_ui_web.png" alt="datos UI web" width="800"/>
+</p>  
+
+
 
 ## Imagen Docker
 Se ha creado el `Dockerfile` para crear la imagen Docker. Para realizar la pruebas se puede montar la imagen en local lanzando los siguientes comandos:
