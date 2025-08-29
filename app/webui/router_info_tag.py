@@ -47,7 +47,7 @@ def _parse_ips_payload(payload):
         # Preferente: línea con dict Python -> parseo seguro
         if ln.startswith("{") and ln.endswith("}"):
             try:
-                d = ast.literal_eval(ln) # evita eval(), solo estructuras literales
+                d = ast.literal_eval(ln)  # evita eval(), solo estructuras literales
                 ip = d.get("ip") or d.get("IP")
                 sim_id = d.get("id") or d.get("ID")
                 if ip or sim_id:
