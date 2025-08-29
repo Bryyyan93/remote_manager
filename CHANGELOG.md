@@ -1,3 +1,11 @@
+# [1.6.0](https://github.com/Bryyyan93/remote_manager/compare/v1.5.7...v1.6.0) (2025-08-29)
+
+
+### Features
+
+* añadir interfaz web fastAPI + htmlx ([b3af9de](https://github.com/Bryyyan93/remote_manager/commit/b3af9de8c6260608e1ecd1268d0df309abab97a5))
+* añadir limites y otros datos en la misma pantalla ([c9bfcd6](https://github.com/Bryyyan93/remote_manager/commit/c9bfcd630e630d40b65600307d15da282649fe71))
+
 ## [1.5.7](https://github.com/Bryyyan93/remote_manager/compare/v1.5.6...v1.5.7) (2025-08-27)
 
 
