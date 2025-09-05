@@ -64,7 +64,14 @@ La estrucrura de los scripts del proyecto, es la siguiente
 ├── gui_upload.py          # Pantalla para subir archivos o ficheros a los dispositivos
 ├── gui_commands.py        # Pantalla emergente para selección de IPs o tags
 📁 app/
+├── 📁 templetes/
+|   ├── base.html               # Layout + estilos oscuros + HTMX (CDN)
+|   ├── _router_info_tag.html   # Vista principal de la informacion por tag
+|   ├── router_info_tag.html    # Parcial HTMX (tabla de resultados)
+├── 📁 webui/
+|   ├── router_info_tag.html    # Pantalla “Consumos por tag” (fusiona consumos + IPs + limites)
 ├── main.py                # Implementacion de llamadas API con FastAPI
+├── version.py             # Guarda la version proveniente del semantic_release (pipeline)
 📁 test/
 ├── test_main_api.py       # Test con testclient de FastAPI a las llamadas de API
 📁 api_onomondo/
