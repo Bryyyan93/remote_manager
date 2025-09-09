@@ -11,6 +11,7 @@
 - [Servidor web](#servidor-web)
 - [Interfaz de escritorio](#interfaz-de-escritorio)
 - [Integración continua](#continuous-integration)
+- [Seguridad](#seguridad)
 
 ## Descripción
 **remote_manager** es una aplicación desarrollada en **Python** que permite la gestión remota de cabeceras. 
@@ -212,7 +213,7 @@ El el workflow `release-build.yml` que solo se realiza en la rama `main`
     <img src="./docs/ci/release.png" alt="releasse" width="150"/>
 </p>  
 
-## 🔐 Seguridad
+## Seguridad
 - El acceso a la API se realiza mediante un token encriptado. Para ello se hace uso del script `encript_pass.py`
 ```bash
 from cryptography.fernet import Fernet
