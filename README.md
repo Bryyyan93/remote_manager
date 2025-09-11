@@ -48,6 +48,13 @@ Para poder trabajar sin problemas se deberá crear un entorno virtual con las de
    ```bash
    pip install -r requirements.txt
    ```
+4. Ver la carpeta `secrets` para colocar los ficheros necesarios
+- .env  
+```sh
+IDEM_ADMIN="gAAA..."
+IDEM_NOADMIN="gAAA..."
+```  
+- `apisecret.key` -> se desencripta en utils.py
 
 ## Estrucura del proyecto
 La estrucrura de los scripts del proyecto, es la siguiente
