@@ -1,3 +1,15 @@
+# [1.7.0](https://github.com/Bryyyan93/remote_manager/compare/v1.6.0...v1.7.0) (2025-09-18)
+
+
+### Bug Fixes
+
+* cambio del lugar de las variables de entorno y asegurarse de que exista ([ec157d8](https://github.com/Bryyyan93/remote_manager/commit/ec157d8332982049aa2e8289097aa44a034391bf))
+
+
+### Features
+
+* añadir cambiar ntp y tiempo para imx ([15d34e0](https://github.com/Bryyyan93/remote_manager/commit/15d34e05d1ffc20ec2edb2bb90f98a113f517a12))
+
 # [1.6.0](https://github.com/Bryyyan93/remote_manager/compare/v1.5.7...v1.6.0) (2025-08-29)
 
 
