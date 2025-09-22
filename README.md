@@ -12,6 +12,7 @@
 - [Interfaz de escritorio](#interfaz-de-escritorio)
 - [Integración continua](#continuous-integration)
 - [Seguridad](#seguridad)
+- [Despliegue continuo](#despliegue-continuo)
 
 ## Descripción
 **remote_manager** es una aplicación desarrollada en **Python** que permite la gestión remota de cabeceras. 
@@ -219,6 +220,86 @@ El el workflow `release-build.yml` que solo se realiza en la rama `main`
 <p align="left">
     <img src="./docs/ci/release.png" alt="releasse" width="150"/>
 </p>  
+
+## Despliegue continuo
+### Despliegue
+Iniciar minikube 
+```sh
+minikube start -p rm --cpus=2 --memory=4096
+```
+💡 Esto crea un cluster aislado llamado `rm` con 2 CPUs y 4GB de RAM.   
+
+Namespace + Secrets (fuera del repo)
+```sh
+# Crear namespace
+kubectl create namespace remote-manager
+
+# Secret para variables de entorno (.env)
+kubectl -n remote-manager create secret generic dotenv \
+  --from-file=.env=./secrets/.env \
+  --dry-run=client -o yaml | kubectl apply -f -
+
+# Secret con clave Fernet
+kubectl -n remote-manager create secret generic fernet-key \
+  --from-file=apisecret_admin.key=./secrets/apisecret_admin.key \
+  --dry-run=client -o yaml | kubectl apply -f -
+
+# Secret para autenticación en Docker Hub (reemplaza TU_USUARIO y TU_TOKEN_O_PASSWORD)
+kubectl -n remote-manager create secret docker-registry regcred \
+  --docker-server=docker.io \
+  --docker-username=TU_USUARIO \
+  --docker-password=TU_TOKEN_O_PASSWORD \
+  --docker-email=tuemail@example.com
+```
+- El archivo `.env` y `apisecret_admin.key` deben existir en `./secrets/`.
+- Usa un token de acceso personal en lugar de tu contraseña de `Docker Hub`.
+
+### Habilitar Ingress en Minikube
+Activa el Ingress Controller de minikube:
+```sh
+minikube -p rm addons enable ingress
+```
+
+### Desplegar con Helm
+```sh
+helm upgrade --install remote-manager remote-manager \
+  -n remote-manager
+``` 
+
+### Configurar DNS local
+Agrega el hostname `remote-manager.local` al archivo `/etc/hosts`:
+```sh
+MINIKUBE_IP=$(minikube -p rm ip)
+echo "$MINIKUBE_IP  remote-manager.local" | sudo tee -a /etc/hosts
+```
+### Verificar el despliegue
+```sh
+curl -i http://remote-manager.local/
+curl -i http://remote-manager.local/ui/info_tag
+```
+🌐 También puedes abrir `http://remote-manager.local` en tu navegador.
+
+### Alternativa rápida sin Ingress (port-forward)
+```sh
+kubectl -n remote-manager port-forward svc/remote-manager 8080:80
+curl -i http://localhost:8080/
+```
+
+### Limpieza
+```sh
+# Desinstalar Helm release
+helm uninstall remote-manager -n remote-manager
+
+# Eliminar namespace
+kubectl delete ns remote-manager
+
+# Eliminar entrada de hosts
+sudo sed -i'' -e '/remote-manager.local/d' /etc/hosts
+
+# (Opcional) Eliminar perfil de Minikube
+minikube delete -p rm
+```
+
 
 ## Seguridad
 - El acceso a la API se realiza mediante un token encriptado. Para ello se hace uso del script `encript_pass.py`
