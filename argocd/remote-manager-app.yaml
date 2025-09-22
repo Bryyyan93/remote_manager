@@ -1,0 +1,35 @@
+# argocd/remote-manager-app.yaml
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: remote-manager
+  namespace: argocd  # <-- Por defecto, Argo CD opera en este namespace
+spec:
+  project: default
+
+  source:
+    repoURL: https://github.com/Bryyyan93/remote_manager.git  # <-- ¡Cambia esto!
+    targetRevision: develop  # o la rama/etiqueta que uses
+    path: remote-manager  # <-- Ruta al Helm Chart dentro del repo
+
+    helm:
+      # Opcional: valores personalizados (puedes omitir si values.yaml está bien)
+      valueFiles:
+        - values.yaml
+      #parameters:
+      #  - name: "image.repository"
+      #    value: "tu-usuario/remote-manager"
+      #  - name: "image.tag"
+      #    value: "latest"  # o usa una versión específica
+        # Añade aquí otros valores que quieras sobreescribir
+
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: remote-manager  # <-- Namespace donde se desplegará la app
+
+  syncPolicy:
+    automated:
+      prune: true   # Elimina recursos que ya no están en el manifest
+      selfHeal: true # Revierte cambios manuales
+    syncOptions:
+      - CreateNamespace=true  # Crea el namespace si no existe
