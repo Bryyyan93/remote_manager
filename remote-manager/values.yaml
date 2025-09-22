@@ -30,6 +30,7 @@ ingress:
 secrets:
   onomondoSecretName: onomondo-secret
   fernetKeySecretName: fernet-key
+  dotenvSecretName: dotenv 
 
 # Bandera opcional para crear los Secrets desde Helm (desactivada por defecto)
 createSecrets:

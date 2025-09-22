@@ -45,21 +45,11 @@ spec:
 
           # --- ENV desde Secret (IDEM_ADMIN) ---
           env:
-            - name: IDEM_ADMIN
-              valueFrom:
-                secretKeyRef:
-                  name: {{ .Values.secrets.onomondoSecretName | default "onomondo-secret" }}
-                  key: IDEM_ADMIN
-          {{- with .Values.env }}
-            {{- toYaml . | nindent 12 }}
-          {{- end }}
-
           # --- Seguridad del contenedor ---
           {{- with .Values.securityContext }}
           securityContext:
             {{- toYaml . | nindent 12 }}
           {{- end }}
-
           # --- Montaje del fichero Fernet como archivo ---
           volumeMounts:
             - name: fernet-key
@@ -69,6 +59,12 @@ spec:
           {{- with .Values.volumeMounts }}
             {{- toYaml . | nindent 12 }}
           {{- end }}
+
+            # .env
+            - name: dotenv
+              mountPath: /app/secrets/.env
+              subPath: .env
+              readOnly: true
 
           # --- Probes HTTP GET / ---
           livenessProbe:
@@ -109,10 +105,16 @@ spec:
             items:
               - key: apisecret_admin.key
                 path: apisecret_admin.key
+
+        - name: dotenv
+          secret:
+            secretName: {{ .Values.secrets.dotenvSecretName }}
+            items:
+              - key: .env
+                path: .env        
       {{- with .Values.volumes }}
         {{- toYaml . | nindent 8 }}
       {{- end }}
-
       {{- with .Values.nodeSelector }}
       nodeSelector:
         {{- toYaml . | nindent 8 }}
