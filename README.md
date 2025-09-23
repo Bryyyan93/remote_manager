@@ -225,7 +225,11 @@ El el workflow `release-build.yml` que solo se realiza en la rama `main`
 ### Despliegue
 Iniciar minikube 
 ```sh
-minikube start -p rm --cpus=2 --memory=4096
+minikube start --kubernetes-version='v1.31.0' \
+  --cpus=2 \
+  --memory=4096 \
+  --addons="metrics-server,default-storageclass,storage-provisioner,ingress" \
+  -p rm
 ```
 💡 Esto crea un cluster aislado llamado `rm` con 2 CPUs y 4GB de RAM.   
 
@@ -300,6 +304,29 @@ sudo sed -i'' -e '/remote-manager.local/d' /etc/hosts
 minikube delete -p rm
 ```
 
+### Desplegar con ArgoCD
+Instalar los CRDs y el namespace `argocd`
+```sh
+kubectl create namespace argocd
+kubectl apply -n argocd -f https://raw.githubusercontent.com/argoproj/argo-cd/stable/manifests/install.yaml
+```
+Exponer la UI
+```sh
+kubectl port-forward svc/argocd-server -n argocd 8080:443
+```
+Acceder a la interfaz `https://localhost:8080`.  
+Obtener las credenciales de acceso. El usuario por defecto de ArgoCD es admin. Para obtener la contraseña, ejecuta el siguiente comando:  
+```sh
+kubectl get secret argocd-initial-admin-secret -n argocd -o jsonpath="{.data.password}" | base64 -d
+```
+
+Lanzar aplicación
+```sh
+kubectl apply -f argocd/remote-manager-app.yaml
+```
+<p align="left">
+    <img src="./docs/cd/argoCD.png" alt=argoCD lanzada" width="600"/>
+</p> 
 
 ## Seguridad
 - El acceso a la API se realiza mediante un token encriptado. Para ello se hace uso del script `encript_pass.py`
