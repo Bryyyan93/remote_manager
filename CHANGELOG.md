@@ -1,3 +1,16 @@
+# [1.8.0](https://github.com/Bryyyan93/remote_manager/compare/v1.7.0...v1.8.0) (2025-09-23)
+
+
+### Bug Fixes
+
+* errores al desplegar con Helm ([2e02e3c](https://github.com/Bryyyan93/remote_manager/commit/2e02e3cb1455be9a532a8b240a7320b41a106675))
+
+
+### Features
+
+* añadir argocd ([fd893a2](https://github.com/Bryyyan93/remote_manager/commit/fd893a226012a2375be765c10be45cd7579f5d9f))
+* desplieuge en kubernetes con Helm ([1bad0b9](https://github.com/Bryyyan93/remote_manager/commit/1bad0b928af3b3f11ae1a292c695e7b612fdc95a))
+
 # [1.7.0](https://github.com/Bryyyan93/remote_manager/compare/v1.6.0...v1.7.0) (2025-09-18)
 
 
