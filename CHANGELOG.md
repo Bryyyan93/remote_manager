@@ -1,3 +1,10 @@
+# [1.9.0](https://github.com/Bryyyan93/remote_manager/compare/v1.8.0...v1.9.0) (2025-10-01)
+
+
+### Features
+
+* añadir la compilacion para la aplicacion de escritorio ([e1531ec](https://github.com/Bryyyan93/remote_manager/commit/e1531ec0b663c8a82e9709315f6017c4bd318f66))
+
 # [1.8.0](https://github.com/Bryyyan93/remote_manager/compare/v1.7.0...v1.8.0) (2025-09-23)
 
 
