@@ -17,25 +17,29 @@
         {% endfor %}
       </select>
 
-      <!-- Botón “Ver datos”: hace GET a /ui/consumos/_list?tag=.... y pinta el parcial -->
       <button
+        id="btn-ver-datos"
         class="btn primary"
         hx-get="/ui/info_tag/_tabla"
         hx-target="#resultado"
         hx-indicator="#cargando"
         hx-include="#tag"
+        hx-on::before-request="this.disabled=true; document.getElementById('resultado').innerHTML='<p class=&quot;muted&quot;>Cargando datos...</p>';"
+        hx-on::after-request="this.disabled=false"
+        hx-on::response-error="this.disabled=false"
       >
         Ver datos
       </button>
 
-      <!-- Botón “Volver”: limpia resultados -->
       <button class="btn ghost" onclick="document.querySelector('#resultado').innerHTML=''">Volver</button>
 
-      <span id="cargando" class="muted" style="display:none" hx-ext="class-tools">Cargando…</span>
+      <span id="cargando" class="htmx-indicator">
+        <span class="loading-dot"></span> Cargando...
+      </span>
     </div>
   </div>
 
   <div id="resultado" class="card">
-    <p class="muted">Selecciona un tag y pulsa “Ver datos”.</p>
+    <p class="muted">Selecciona un tag y pulsa "Ver datos".</p>
   </div>
 {% endblock %}

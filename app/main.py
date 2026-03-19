@@ -80,6 +80,24 @@ def get_limites(tag):
         raise HTTPException(500, detail=str(e))
 
 
+# Dataset unificado por tag (optimizado para Web UI)
+@app.get("/tag_data/all")
+def get_all_tag_data():
+    try:
+        return api.get_all_tags_snapshot()
+    except Exception as e:
+        raise HTTPException(500, detail=str(e))
+
+
+# Dataset unificado por tag (optimizado para Web UI)
+@app.get("/tag_data/{tag}")
+def get_tag_data(tag):
+    try:
+        return api.get_tag_snapshot(tag)
+    except Exception as e:
+        raise HTTPException(500, detail=str(e))
+
+
 ##############################################################
 # GUI_COMMANDS
 ##############################################################

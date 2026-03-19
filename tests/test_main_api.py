@@ -68,3 +68,25 @@ def test_get_limites(mock_tag):
 
     assert response.status_code == 200
     assert response.json() == {"limites": ["Usado", "Limite", "Estado"]}
+
+
+@patch("app.main.api.get_tag_snapshot")
+def test_get_tag_data_single(mock_snapshot):
+    mock_snapshot.return_value = {"tag": "site-a", "rows": [], "errors": []}
+
+    response = client.get("/tag_data/site-a")
+
+    assert response.status_code == 200
+    assert response.json() == {"tag": "site-a", "rows": [], "errors": []}
+    mock_snapshot.assert_called_once_with("site-a")
+
+
+@patch("app.main.api.get_all_tags_snapshot")
+def test_get_tag_data_all_success(mock_all):
+    mock_all.return_value = {"items": [{"tag": "site-a", "rows": []}], "errors": []}
+
+    response = client.get("/tag_data/all")
+
+    assert response.status_code == 200
+    assert response.json() == {"items": [{"tag": "site-a", "rows": []}], "errors": []}
+    mock_all.assert_called_once_with()

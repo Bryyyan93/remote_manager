@@ -1,9 +1,8 @@
+from pathlib import Path
 from cryptography.fernet import Fernet
 from dotenv import load_dotenv
-import os
-import paramiko
-import hashlib
-import logging
+import os, logging
+import paramiko, hashlib
 import tkinter as tk
 
 
@@ -11,15 +10,34 @@ import tkinter as tk
 # Hacer el header para la peticion API
 ########################################################
 def api_headers():
-    load_dotenv()  # Cargar variables de entorno desde el archivo .env
-    # idem_noadmin = os.getenv("IDEM_NOADMIN")
+    # Carpeta base del proyecto = subir 1 nivel desde ssh/
+    project_root = Path(__file__).resolve().parents[1]   # sube de ssh/ a raíz del repo
+
+    # Buscar carpeta secrets en cualquier sitio dentro de ese root
+    secrets_dir = project_root / "secrets"
+    env_path = secrets_dir / ".env"
+    key_path = secrets_dir / "apisecret_admin.key"
+
+    # Si no existen, dar error claro
+    if not secrets_dir.exists():
+        raise FileNotFoundError(f"No se encontró {secrets_dir}")
+    if not env_path.exists():
+        raise FileNotFoundError(f"No se encontró {env_path}")
+    if not key_path.exists():
+        raise FileNotFoundError(f"No se encontró {key_path}")
+
+    # Cargar variables de entorno
+    load_dotenv(dotenv_path=env_path)
+
     idem_admin = os.getenv("IDEM_ADMIN")
-    # Leer la clave previamente guardada
-    with open("./secrets/apisecret_admin.key", "rb") as key_file:
-        key = key_file.read()
-    # Crear el objeto Fernet con la clave
-    cipher_suite = Fernet(key)
-    api_idem = cipher_suite.decrypt(idem_admin)
+    if not idem_admin:
+        raise RuntimeError(f"No se encontró IDEM_ADMIN en {env_path}")
+
+    idem_admin = idem_admin.strip()
+    # Cargar clave Fernet
+    key = key_path.read_bytes()
+    cipher = Fernet(key)
+    api_idem = cipher.decrypt(idem_admin.encode()).decode()
 
     # Header
     headers = {

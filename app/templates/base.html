@@ -26,6 +26,13 @@
     th { text-align:left; color:#cbd5e1; font-weight:600; }
     .error { color:#fca5a5; background:#450a0a; border:1px solid #7f1d1d; padding:.6rem .8rem; border-radius:.6rem; }
     .toolbar { display:flex; gap:.5rem; align-items:center; flex-wrap:wrap; }
+    .htmx-indicator { display:none; }
+    .htmx-indicator.htmx-request { display:inline-flex; align-items:center; gap:.45rem; color:#93c5fd; }
+    .loading-dot {
+      width:.5rem; height:.5rem; border-radius:999px; background:#60a5fa; display:inline-block;
+      animation:pulse 1s ease-in-out infinite;
+    }
+    @keyframes pulse { 0%,100%{opacity:.35} 50%{opacity:1} }
 
     /* Colores para limites*/
     .badge{display:inline-block;padding:.15rem .45rem;border-radius:.45rem;border:1px solid transparent}

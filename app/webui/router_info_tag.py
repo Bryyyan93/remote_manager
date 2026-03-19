@@ -1,11 +1,13 @@
 # webui/router_info_tag.py
-from fastapi import APIRouter, Request, HTTPException
+from fastapi import APIRouter, Request
 from fastapi.responses import HTMLResponse
 from fastapi.templating import Jinja2Templates
 import httpx, os, re, ast
 
 
+# Router de la UI. Se monta bajo /ui para no mezclar con la API JSON.
 router = APIRouter(prefix="/ui", tags=["ui"])
+# Carpeta de plantillas Jinja2
 templates = Jinja2Templates(directory="./app/templates")
 # URL del backend.
 BACKEND_URL = os.environ.get("UI_BACKEND_URL", "http://localhost:8000")
@@ -13,16 +15,8 @@ BACKEND_URL = os.environ.get("UI_BACKEND_URL", "http://localhost:8000")
 
 def _parse_ips_payload(payload):
     """
-    Entrada posible (cualquiera de estas):
-      - {"ips":[...]} | list[str] | str (con \n)
-      - Bloque tipo:
-          Tag: ElPedroso ->
-          SIMs Online:
-          {'id': '002369459', 'ip': '100.88.244.238'}
-          ...
-          SIMs offline:
-          {'id': '002369460', 'ip': '100.88.244.239'}
-    Devuelve: [{"id": str, "ip": str, "estado": "online"|"offline"|None}, ...]
+    Normaliza la respuesta de /all_ips/{tag} a una lista de dicts con estructura:
+      [{"id": str, "ip": str, "estado": "online"|"offline"|None}, ...]
     """
     # Normaliza a texto
     if isinstance(payload, dict) and "ips" in payload:
@@ -33,14 +27,16 @@ def _parse_ips_payload(payload):
     else:
         text = str(payload)
 
+    # Limpieza de líneas y estado de sección
     lines = [ln.strip() for ln in text.splitlines() if ln.strip()]
     out, estado = [], None
 
     for ln in lines:
         low = ln.lower()
-        # encabezados
+        # Quitar encabezados que no contienen datos
         if low.startswith("tag:"):
             continue
+        # Detectar sección (afecta a las filas siguientes)
         if "sims online" in low:
             estado = "online"
             continue
@@ -48,10 +44,10 @@ def _parse_ips_payload(payload):
             estado = "offline"
             continue
 
-        # 1) Preferente: línea con dict Python {'id': '...', 'ip': '...'}
+        # Preferente: línea con dict Python -> parseo seguro
         if ln.startswith("{") and ln.endswith("}"):
             try:
-                d = ast.literal_eval(ln)
+                d = ast.literal_eval(ln)  # evita eval(), solo estructuras literales
                 ip = d.get("ip") or d.get("IP")
                 sim_id = d.get("id") or d.get("ID")
                 if ip or sim_id:
@@ -60,9 +56,10 @@ def _parse_ips_payload(payload):
                                 "estado": estado})
                     continue
             except Exception:
-                pass  # caemos al regex
+                # Si falla (formato extraño), caemos al regex
+                pass
 
-        # 2) Fallback regex (IP e ID con o sin comillas)
+        # Fallback: extraer IP e ID con regex (acepta comillas y distintos separadores)
         ip_m = re.search(r"(\d{1,3}(?:\.\d{1,3}){3})", ln)
         id_m = re.search(r"(?:['\"]?id['\"]?\s*[:=]\s*['\"]?)(\d+)", ln, re.I)
         if ip_m or id_m:
@@ -84,19 +81,13 @@ def _parse_ips_payload(payload):
 
 def _parse_consumos_payload(payload):
     """
-    Acepta:
-      - str con el bloque "Tag: ... ID: 123, Status: ..., Usado: 1.2 MB, Periodo: monthly"
-      - list[str] con ese mismo bloque
-      - {"consumos": "..."} envoltorio
-      - list[dict] ya normalizado (lo devuelve tal cual)
-
-    Devuelve: (items:list[dict], raw:any)   # raw != None si no se pudo normalizar
+    Normaliza la respuesta de /consumos/{tag}.
     """
-    # Caso ya normalizado
+    # Caso ya normalizado (JSON list[dict])
     if isinstance(payload, list) and payload and isinstance(payload[0], dict):
         return payload, None
 
-    # Extraer el texto
+    # Extraer texto de distintas envolturas
     text = None
     if isinstance(payload, dict) and "consumos" in payload:
         text = payload["consumos"]
@@ -115,6 +106,7 @@ def _parse_consumos_payload(payload):
         r"ID:\s*(\d+),\s*Status:\s*([^,]+),\s*Usado:\s*([\d\.,]+)\s*MB,\s*Periodo:\s*([^\s,]+)",
         re.IGNORECASE,
     )
+
     items = []
     for m in pattern.finditer(text):
         _id = m.group(1).strip()
@@ -134,7 +126,15 @@ def _parse_consumos_payload(payload):
 
 
 def _parse_limites_payload(payload):
-    # acepta: str | list[str] | {"limites": "..."}
+    """
+    Normaliza la respuesta de /limites/{tag} a una lista de dicts:
+      [{'id', 'usage_mb_lim', 'limit_mb', 'limit_state'}, ...]
+
+    Acepta:
+      - {"limites": "..."} | list[str] | str con líneas:
+          "ID: 002369459, Usado: 17.51 MB, Limite: 50.0 MB, Estado: Limite no alcanzado"
+    """
+    # Homogeneizar a texto
     if isinstance(payload, dict) and "limites" in payload:
         text = str(payload["limites"])
     elif isinstance(payload, list):
@@ -142,6 +142,7 @@ def _parse_limites_payload(payload):
     else:
         text = str(payload)
 
+    # Regex de 4 grupos: id, usado, límite, estado
     pat = re.compile(
         r"ID:\s*(\d+),\s*Usado:\s*([\d\.,]+)\s*MB,\s*Limite:\s*([\d\.,]+)\s*MB,\s*Estado:\s*([^\n]+)",
         re.I,
@@ -152,6 +153,7 @@ def _parse_limites_payload(payload):
         usado = m.group(2).strip().replace(",", ".")
         limite = m.group(3).strip().replace(",", ".")
         estado = m.group(4).strip()
+        # Convertir a float si es posible (si no, dejar string)
         try:
             usado = float(usado)
         except ValueError:
@@ -168,7 +170,8 @@ def _parse_limites_payload(payload):
 @router.get("/info_tag", response_class=HTMLResponse)
 async def ui_consumos_home(request: Request):
     """
-    Página principal: carga los 'tags' al abrir.
+    Página principal de 'Info por tag'.
+    Requisito: cargar los tags al abrir, sin romper si /tags falla.
     """
     try:
         async with httpx.AsyncClient(timeout=10) as client:
@@ -194,58 +197,24 @@ async def ui_consumos_home(request: Request):
 @router.get("/info_tag/_tabla", response_class=HTMLResponse)
 async def ui_consumos_list(request: Request, tag: str):
     """
-    Fragmento HTMX: pide JSON a /consumos/{tag} y lo renderiza.
-    No reescribe lógica, solo traduce JSON -> HTML.
+    Parcial HTMX que construye la tabla:
+      - Llama a /consumos/{tag}, /all_ips/{tag}, /limites/{tag}
+      - Parsea cada respuesta de forma tolerante
+      - Fusiona por 'id'
+      - Devuelve '_router_info_tag_tabla.html' con 'rows'
     """
     try:
-        async with httpx.AsyncClient(timeout=50) as client:
-            c = await client.get(f"{BACKEND_URL}/consumos/{tag}")
-            c.raise_for_status()
-
-            i = await client.get(f"{BACKEND_URL}/all_ips/{tag}")
-            i.raise_for_status()
-
-            li = await client.get(f"{BACKEND_URL}/limites/{tag}")
-            li.raise_for_status()
-
-            cons_items, cons_raw = _parse_consumos_payload(c.json())
-            ips_items = _parse_ips_payload(i.json())
-            lim_items = _parse_limites_payload(li.json())
-    except httpx.HTTPStatusError as he:
-        raise HTTPException(status_code=he.response.status_code, detail=str(he))
+        async with httpx.AsyncClient(timeout=60) as client:
+            r = await client.get(f"{BACKEND_URL}/tag_data/{tag}")
+            r.raise_for_status()
+            payload = r.json()
     except Exception as e:
-        # Devuelve el parcial con un bloque de error
         return templates.TemplateResponse(
             "_router_info_tag_tabla.html",
-            {"request": request, "raw": None, "error": f"Error: {e}", "tag": tag},
+            {"request": request, "raw": None, "error": f"Error al consultar backend: {e}", "tag": tag},
             status_code=200,
         )
-
-    # Fusionar por ID
-    idx = {}
-    for it in cons_items:
-        idx.setdefault(it["id"], {}).update({
-            "id": it["id"],
-            "usage_mb": it.get("usage_mb"),
-            "period": it.get("period"),
-            "conn_state": it.get("status"),  # por si ya viene
-        })
-
-    for it in ips_items:
-        idx.setdefault(it["id"], {}).update({
-            "id": it["id"],
-            "ip": it.get("ip"),
-            "conn_state": it.get("estado") or idx.get(it["id"], {}).get("conn_state"),
-        })
-
-    for it in lim_items:
-        idx.setdefault(it["id"], {}).update({
-            "id": it["id"],
-            "limit_mb": it.get("limit_mb"),
-            "limit_state": it.get("limit_state"),
-        })
-
-    rows = sorted(idx.values(), key=lambda x: x.get("id", ""))
+    rows = payload.get("rows", []) if isinstance(payload, dict) else []
     return templates.TemplateResponse(
         "_router_info_tag_tabla.html",
         {"request": request, "rows": rows, "error": None, "tag": tag},

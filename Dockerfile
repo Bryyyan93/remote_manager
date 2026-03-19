@@ -10,10 +10,8 @@ ENV PYTHONDONTWRITEBYTECODE=1 \
 RUN apt-get update && apt-get install -y --no-install-recommends \
     ca-certificates tzdata openssh-client \
     build-essential libffi-dev libssl-dev \
+    python3-tk tk tcl \
  && rm -rf /var/lib/apt/lists/*
-
-# Paquetes necesarios para tkinter (si usas GUI)
-RUN apt-get update && apt-get install -y python3-tk tk-dev
 
 # Directorio de la app
 WORKDIR /app
@@ -27,17 +25,17 @@ COPY api_onomondo ./api_onomondo
 COPY app ./app
 COPY ssh ./ssh
 
-# (Opcional) Usuario no-root
-# RUN useradd -m appuser && chown -R appuser:appuser /app
-USER root
+# Usuario no-root
+RUN useradd -m appuser && chown -R appuser:appuser /app
+# USER root
 
 # Expone la API
 EXPOSE 8000
 
-# Healthcheck simple (requiere curl; si no lo tienes, puedes quitarlo)
+# Healthcheck simple (requiere curl)
 # RUN apt-get update && apt-get install -y --no-install-recommends curl && rm -rf /var/lib/apt/lists/*
 # HEALTHCHECK --interval=30s --timeout=5s --retries=3 \
 #   CMD curl -fsS http://127.0.0.1:8000/docs >/dev/null || exit 1
 
-# Lanza FastAPI (ajusta el módulo si no es app/main.py)
+# Lanza FastAPI
 CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000"]
