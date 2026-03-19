@@ -11,6 +11,8 @@
 - [Servidor web](#servidor-web)
 - [Interfaz de escritorio](#interfaz-de-escritorio)
 - [Integración continua](#continuous-integration)
+- [Seguridad](#seguridad)
+- [Despliegue continuo](#despliegue-continuo)
 
 ## Descripción
 **remote_manager** es una aplicación desarrollada en **Python** que permite la gestión remota de cabeceras. 
@@ -47,6 +49,13 @@ Para poder trabajar sin problemas se deberá crear un entorno virtual con las de
    ```bash
    pip install -r requirements.txt
    ```
+4. Ver la carpeta `secrets` para colocar los ficheros necesarios
+- .env  
+```sh
+IDEM_ADMIN="gAAA..."
+IDEM_NOADMIN="gAAA..."
+```  
+- `apisecret.key` -> se desencripta en utils.py
 
 ## Estrucura del proyecto
 La estrucrura de los scripts del proyecto, es la siguiente
@@ -64,7 +73,14 @@ La estrucrura de los scripts del proyecto, es la siguiente
 ├── gui_upload.py          # Pantalla para subir archivos o ficheros a los dispositivos
 ├── gui_commands.py        # Pantalla emergente para selección de IPs o tags
 📁 app/
+├── 📁 templetes/
+|   ├── base.html               # Layout + estilos oscuros + HTMX (CDN)
+|   ├── _router_info_tag.html   # Vista principal de la informacion por tag
+|   ├── router_info_tag.html    # Parcial HTMX (tabla de resultados)
+├── 📁 webui/
+|   ├── router_info_tag.html    # Pantalla “Consumos por tag” (fusiona consumos + IPs + limites)
 ├── main.py                # Implementacion de llamadas API con FastAPI
+├── version.py             # Guarda la version proveniente del semantic_release (pipeline)
 📁 test/
 ├── test_main_api.py       # Test con testclient de FastAPI a las llamadas de API
 📁 api_onomondo/
@@ -101,25 +117,38 @@ def test_get_tags(mock_headers, mock_tags):
 - Es un test de unidad de un endpoint: verifica que `/tags` responde como debe.
 
 ## Servidor web
-Para el servicio web se ga usado Uvicorn que es un servidor web rápido y asíncrono para aplicaciones Python, 
+Para el servicio web se ha usado Uvicorn que es un servidor web rápido y asíncrono para aplicaciones Python, 
 especialmente diseñado para ser usado con frameworks como FastAPI. Actúa como un puente entre tu aplicación 
 web y las conexiones de red, permitiendo que tu código Python se ejecute de manera eficiente.   
 
-Se ejecuta de la siguiente manera
+Se ejecuta de la siguiente manera:
 ```sh
 uvicorn app.main:app --reload
 ```  
 <p align="center">
-    <img src="./docs/FastAPI/uvicorn_cli.png" alt="uviconr_cli" width="800"/>
+    <img src="./docs/FastAPI_UI_web/uvicorn_cli.png" alt="uviconr_cli" width="800"/>
 </p>  
 
 Se accede a la interfaz web por la IP que se nos indica:
 ```sh
-http://127.0.0.1:8000/docs 
+http://localhost:8000/docs 
 ```  
 <p align="center">
-    <img src="./docs/FastAPI/uvicorn_gui.png" alt="uviconr_gui" width="800"/>
+    <img src="./docs/FastAPI_UI_web/uvicorn_gui.png" alt="uviconr_gui" width="800"/>
 </p>
+
+### UI web (FastAPI + Jinja2 + HTMX)
+Esta UI añade pantallas web que consultan por HTTP interno los endpoints existentes y pintan una tabla con la 
+información de cada SIM por tag: ID, IP, uso (MB), límite de datos (MB), período, estado de conexión.
+Para acceder a la interfáz se hara de la siguiente manera:
+```sh
+http://localhost:8000/ui/info_tag
+```
+<p align="center">
+    <img src="./docs/FastAPI_UI_web/datos_ui_web.png" alt="datos UI web" width="800"/>
+</p>  
+
+
 
 ## Imagen Docker
 Se ha creado el `Dockerfile` para crear la imagen Docker. Para realizar la pruebas se puede montar la imagen en local lanzando los siguientes comandos:
@@ -191,3 +220,133 @@ El el workflow `release-build.yml` que solo se realiza en la rama `main`
 <p align="left">
     <img src="./docs/ci/release.png" alt="releasse" width="150"/>
 </p>  
+
+## Despliegue continuo
+### Despliegue
+Iniciar minikube 
+```sh
+minikube start --kubernetes-version='v1.31.0' \
+  --cpus=2 \
+  --memory=4096 \
+  --addons="metrics-server,default-storageclass,storage-provisioner,ingress" \
+  -p rm
+```
+💡 Esto crea un cluster aislado llamado `rm` con 2 CPUs y 4GB de RAM.   
+
+Namespace + Secrets (fuera del repo)
+```sh
+# Crear namespace
+kubectl create namespace remote-manager
+
+# Secret para variables de entorno (.env)
+kubectl -n remote-manager create secret generic dotenv \
+  --from-file=.env=./secrets/.env \
+  --dry-run=client -o yaml | kubectl apply -f -
+
+# Secret con clave Fernet
+kubectl -n remote-manager create secret generic fernet-key \
+  --from-file=apisecret_admin.key=./secrets/apisecret_admin.key \
+  --dry-run=client -o yaml | kubectl apply -f -
+
+# Secret para autenticación en Docker Hub (reemplaza TU_USUARIO y TU_TOKEN_O_PASSWORD)
+kubectl -n remote-manager create secret docker-registry regcred \
+  --docker-server=docker.io \
+  --docker-username=TU_USUARIO \
+  --docker-password=TU_TOKEN_O_PASSWORD \
+  --docker-email=tuemail@example.com
+```
+- El archivo `.env` y `apisecret_admin.key` deben existir en `./secrets/`.
+- Usa un token de acceso personal en lugar de tu contraseña de `Docker Hub`.
+
+### Habilitar Ingress en Minikube
+Activa el Ingress Controller de minikube:
+```sh
+minikube -p rm addons enable ingress
+```
+
+### Desplegar con Helm
+```sh
+helm upgrade --install remote-manager remote-manager \
+  -n remote-manager
+``` 
+
+### Configurar DNS local
+Agrega el hostname `remote-manager.local` al archivo `/etc/hosts`:
+```sh
+MINIKUBE_IP=$(minikube -p rm ip)
+echo "$MINIKUBE_IP  remote-manager.local" | sudo tee -a /etc/hosts
+```
+### Verificar el despliegue
+```sh
+curl -i http://remote-manager.local/
+curl -i http://remote-manager.local/ui/info_tag
+```
+🌐 También puedes abrir `http://remote-manager.local` en tu navegador.
+
+### Alternativa rápida sin Ingress (port-forward)
+```sh
+kubectl -n remote-manager port-forward svc/remote-manager 8080:80
+curl -i http://localhost:8080/
+```
+
+### Limpieza
+```sh
+# Desinstalar Helm release
+helm uninstall remote-manager -n remote-manager
+
+# Eliminar namespace
+kubectl delete ns remote-manager
+
+# Eliminar entrada de hosts
+sudo sed -i'' -e '/remote-manager.local/d' /etc/hosts
+
+# (Opcional) Eliminar perfil de Minikube
+minikube delete -p rm
+```
+
+### Desplegar con ArgoCD
+Instalar los CRDs y el namespace `argocd`
+```sh
+kubectl create namespace argocd
+kubectl apply -n argocd -f https://raw.githubusercontent.com/argoproj/argo-cd/stable/manifests/install.yaml
+```
+Exponer la UI
+```sh
+kubectl port-forward svc/argocd-server -n argocd 8080:443
+```
+Acceder a la interfaz `https://localhost:8080`.  
+Obtener las credenciales de acceso. El usuario por defecto de ArgoCD es admin. Para obtener la contraseña, ejecuta el siguiente comando:  
+```sh
+kubectl get secret argocd-initial-admin-secret -n argocd -o jsonpath="{.data.password}" | base64 -d
+```
+
+Lanzar aplicación
+```sh
+kubectl apply -f argocd/remote-manager-app.yaml
+```
+<p align="left">
+    <img src="./docs/cd/argoCD.png" alt=argoCD lanzada" width="600"/>
+</p> 
+
+## Seguridad
+- El acceso a la API se realiza mediante un token encriptado. Para ello se hace uso del script `encript_pass.py`
+```bash
+from cryptography.fernet import Fernet
+
+# Generar una clave y guardarla para su uso posterior
+key = Fernet.generate_key()
+
+# Guardar la clave en un archivo seguro (esto es importante para poder desencriptar después)
+with open("apisecret.key", "wb") as key_file:
+    key_file.write(key)
+
+# Crear el objeto Fernet con la clave generada
+cipher_suite = Fernet(key)
+
+# La API key que deseas encriptar
+api_key = b"API key"
+# Encriptar la API key
+cipher_text = cipher_suite.encrypt(api_key)
+print(f"API key encriptada: {cipher_text}")
+```
+- Las conexiones SSH requieren usuario, contraseña y se realizan con aceptación automática de claves.

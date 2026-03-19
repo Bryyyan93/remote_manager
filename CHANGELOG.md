@@ -1,3 +1,43 @@
+# [1.9.0](https://github.com/Bryyyan93/remote_manager/compare/v1.8.0...v1.9.0) (2025-10-01)
+
+
+### Features
+
+* añadir la compilacion para la aplicacion de escritorio ([e1531ec](https://github.com/Bryyyan93/remote_manager/commit/e1531ec0b663c8a82e9709315f6017c4bd318f66))
+
+# [1.8.0](https://github.com/Bryyyan93/remote_manager/compare/v1.7.0...v1.8.0) (2025-09-23)
+
+
+### Bug Fixes
+
+* errores al desplegar con Helm ([2e02e3c](https://github.com/Bryyyan93/remote_manager/commit/2e02e3cb1455be9a532a8b240a7320b41a106675))
+
+
+### Features
+
+* añadir argocd ([fd893a2](https://github.com/Bryyyan93/remote_manager/commit/fd893a226012a2375be765c10be45cd7579f5d9f))
+* desplieuge en kubernetes con Helm ([1bad0b9](https://github.com/Bryyyan93/remote_manager/commit/1bad0b928af3b3f11ae1a292c695e7b612fdc95a))
+
+# [1.7.0](https://github.com/Bryyyan93/remote_manager/compare/v1.6.0...v1.7.0) (2025-09-18)
+
+
+### Bug Fixes
+
+* cambio del lugar de las variables de entorno y asegurarse de que exista ([ec157d8](https://github.com/Bryyyan93/remote_manager/commit/ec157d8332982049aa2e8289097aa44a034391bf))
+
+
+### Features
+
+* añadir cambiar ntp y tiempo para imx ([15d34e0](https://github.com/Bryyyan93/remote_manager/commit/15d34e05d1ffc20ec2edb2bb90f98a113f517a12))
+
+# [1.6.0](https://github.com/Bryyyan93/remote_manager/compare/v1.5.7...v1.6.0) (2025-08-29)
+
+
+### Features
+
+* añadir interfaz web fastAPI + htmlx ([b3af9de](https://github.com/Bryyyan93/remote_manager/commit/b3af9de8c6260608e1ecd1268d0df309abab97a5))
+* añadir limites y otros datos en la misma pantalla ([c9bfcd6](https://github.com/Bryyyan93/remote_manager/commit/c9bfcd630e630d40b65600307d15da282649fe71))
+
 ## [1.5.7](https://github.com/Bryyyan93/remote_manager/compare/v1.5.6...v1.5.7) (2025-08-27)
 
 

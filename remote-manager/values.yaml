@@ -1,0 +1,123 @@
+# values.yaml
+
+replicaCount: 1
+
+image:
+  repository: bryyyan/remote   # ⚠️ Cambia OWNER por tu org/user
+  tag: latest
+  pullPolicy: IfNotPresent
+  pullSecrets:    # p.ej. - name: regcred (si usas GHCR privado)
+    - name: regcred
+
+service:
+  type: ClusterIP
+  port: 80
+  targetPort: 8000
+  annotations: {}
+
+ingress:
+  enabled: true
+  className: nginx
+  annotations: {}
+  hosts:
+    - host: remote-manager.local
+      paths:
+        - path: /
+          pathType: Prefix
+  tls: []
+
+# Nombres de los Secrets ya creados en K8s
+secrets:
+  onomondoSecretName: onomondo-secret
+  fernetKeySecretName: fernet-key
+  dotenvSecretName: dotenv 
+
+# Bandera opcional para crear los Secrets desde Helm (desactivada por defecto)
+createSecrets:
+  onomondo:
+    enabled: false
+    value: ""
+  fernetKey:
+    enabled: false
+    value: ""
+
+# Recursos
+resources:
+  requests:
+    cpu: 100m
+    memory: 256Mi
+  limits:
+    cpu: 500m
+    memory: 512Mi
+
+# Seguridad
+podSecurityContext:
+  fsGroup: 2000
+
+securityContext:
+  runAsNonRoot: true
+  runAsUser: 10001
+  runAsGroup: 10001
+  readOnlyRootFilesystem: true
+  allowPrivilegeEscalation: false
+  seccompProfile:
+    type: RuntimeDefault
+
+# Probes sobre GET /
+probes:
+  liveness:
+    path: /
+    initialDelaySeconds: 10
+    periodSeconds: 10
+    timeoutSeconds: 2
+    failureThreshold: 3
+  readiness:
+    path: /
+    initialDelaySeconds: 5
+    periodSeconds: 5
+    timeoutSeconds: 2
+    failureThreshold: 3
+  startup:
+    enabled: true
+    path: /
+    failureThreshold: 30
+    periodSeconds: 5
+
+# Si habilitas HPA, se ignora replicaCount en el Deployment
+autoscaling:
+  enabled: false
+  minReplicas: 1
+  maxReplicas: 5
+
+  # Targets típicos (usa uno o ambos)
+  targetCPUUtilizationPercentage: 70         # opcional
+  targetMemoryUtilizationPercentage: null    # opcional (pon un número para activarlo)
+
+  # Comportamiento opcional (cooldowns, límites, etc.). Puedes borrarlo si no lo necesitas.
+  behavior:
+    scaleUp:
+      stabilizationWindowSeconds: 0
+      policies:
+        - type: Percent
+          value: 100     # puede duplicar en 1 ciclo
+          periodSeconds: 60
+        - type: Pods
+          value: 4       # o hasta 4 pods por minuto
+          periodSeconds: 60
+      selectPolicy: Max
+    scaleDown:
+      stabilizationWindowSeconds: 300
+      policies:
+        - type: Percent
+          value: 10
+          periodSeconds: 60
+      selectPolicy: Max
+
+# Variables extra opcionales
+env: []
+# - name: LOG_LEVEL
+#   value: debug
+
+nodeSelector: {}
+tolerations: []
+affinity: {}
